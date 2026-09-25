@@ -1,0 +1,26 @@
+{
+	"name": "@eshanika/database",
+	"version": "0.0.0",
+	"private": true,
+	"type": "module",
+	"exports": {
+		"./db": "./src/prisma/db.ts"
+	},
+	"scripts": {
+		"contract:emit": "prisma contract emit",
+		"db:init": "prisma db init",
+		"db:update": "prisma db update",
+		"check-types": "tsc --noEmit",
+		"lint": "biome check"
+	},
+	"dependencies": {
+		"@prisma/orm-postgres": "8.0.0-rc.12",
+		"dotenv": "18.0.4"
+	},
+	"devDependencies": {
+		"@prisma/cli-engine": "0.6.1",
+		"@types/node": "26.6.2",
+		"prisma": "8.0.0-rc.17",
+		"typescript": "7.0.2"
+	}
+}
