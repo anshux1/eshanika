@@ -7,20 +7,22 @@
 		"./db": "./src/prisma/db.ts"
 	},
 	"scripts": {
-		"contract:emit": "prisma contract emit",
-		"db:init": "prisma db init",
-		"db:update": "prisma db update",
-		"check-types": "tsc --noEmit",
+		"build": "prisma generate",
+		"db:generate": "prisma generate",
+		"db:migrate:dev": "prisma migrate dev",
+		"db:migrate:deploy": "prisma migrate deploy",
+		"check-types": "prisma generate && tsc --noEmit",
 		"lint": "biome check"
 	},
 	"dependencies": {
-		"@prisma/orm-postgres": "8.0.0-rc.12",
+		"@eshanika/env": "workspace:*",
+		"@prisma/adapter-pg": "7.10.0",
+		"@prisma/client": "7.10.0",
 		"dotenv": "18.0.4"
 	},
 	"devDependencies": {
-		"@prisma/cli-engine": "0.6.1",
 		"@types/node": "26.6.2",
-		"prisma": "8.0.0-rc.17",
+		"prisma": "7.10.0",
 		"typescript": "7.0.2"
 	}
 }

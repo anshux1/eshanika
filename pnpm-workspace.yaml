@@ -3,13 +3,13 @@ packages:
   - "packages/*"
 
 allowBuilds:
+  '@prisma/engines': true
   esbuild: true
   msgpackr-extract: true
+  prisma: true
   workerd: true
 
 minimumReleaseAgeExclude:
-  - '@prisma/composer-cli@0.23.0'
-  - '@prisma/composer@0.23.0'
   - '@turbo/darwin-64@2.11.4'
   - '@turbo/darwin-arm64@2.11.4'
   - '@turbo/linux-64@2.11.4'
@@ -17,5 +17,6 @@ minimumReleaseAgeExclude:
   - '@turbo/windows-64@2.11.4'
   - '@turbo/windows-arm64@2.11.4'
   - dotenv@18.0.4
-  - prisma@8.0.0-rc.17
   - turbo@2.11.4
+  - '@tanstack/query-core@5.104.0'
+  - '@tanstack/react-query@5.104.0'

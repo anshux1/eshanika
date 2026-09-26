@@ -11,7 +11,11 @@
     "check-types": "next typegen && tsc --noEmit"
   },
   "dependencies": {
+    "@eshanika/auth": "workspace:*",
+    "@eshanika/orpc": "workspace:*",
     "@eshanika/ui": "workspace:*",
+    "@tanstack/react-query": "5.104.0",
+    "better-auth": "1.7.6",
     "next": "16.3.6",
     "next-themes": "0.4.6",
     "react": "19.3.0",

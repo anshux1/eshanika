@@ -1,0 +1,23 @@
+{
+	"name": "@eshanika/env",
+	"version": "0.0.0",
+	"private": true,
+	"type": "module",
+	"exports": {
+		"./database": "./src/database.ts",
+		"./auth": "./src/auth.ts"
+	},
+	"scripts": {
+		"check-types": "tsc --noEmit",
+		"lint": "biome check"
+	},
+	"dependencies": {
+		"@t3-oss/env-core": "0.13.11",
+		"zod": "4.6.5"
+	},
+	"devDependencies": {
+		"@eshanika/biome-config": "workspace:*",
+		"@types/node": "26.6.2",
+		"typescript": "7.0.2"
+	}
+}

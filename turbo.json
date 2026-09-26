@@ -5,7 +5,8 @@
     "build": {
       "dependsOn": ["^build"],
       "inputs": ["$TURBO_DEFAULT$", ".env*"],
-      "outputs": [".next/**", "!.next/cache/**", "!.next/dev/**"]
+      "env": ["DATABASE_URL", "BETTER_AUTH_SECRET", "BETTER_AUTH_URL"],
+      "outputs": [".next/**", "!.next/cache/**", "!.next/dev/**", "src/generated/prisma/**"]
     },
     "lint": {
       "dependsOn": ["^lint"]
@@ -15,6 +16,7 @@
     },
     "dev": {
       "cache": false,
+      "dependsOn": ["^build"],
       "persistent": true
     }
   }
