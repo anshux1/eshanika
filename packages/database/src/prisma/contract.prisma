@@ -1,0 +1,1088 @@
+// use prisma-8
+
+enum AdminAuditOutcome {
+  success
+  failure
+}
+
+enum AdminRole {
+  owner
+  editor
+  support
+}
+
+enum AdminMembershipStatus {
+  active
+  suspended
+}
+
+enum AttributeDisplayType {
+  select
+  swatch
+}
+
+enum AttributeStatus {
+  active
+  archived
+}
+
+enum UserRole {
+  admin
+  customer
+}
+
+enum CartStatus {
+  active
+  converted
+  abandoned
+}
+
+enum CategoryStatus {
+  active
+  archived
+}
+
+enum ContentEntryStatus {
+  draft
+  published
+  private
+  archived
+}
+
+enum ContentEntryKind {
+  page
+  footer
+}
+
+enum DiscountKind {
+  fixed
+  percentage
+}
+
+enum FulfillmentStatus {
+  pending
+  packed
+  shipped
+  out_for_delivery
+  delivered
+  failed
+  returned
+}
+
+enum FulfillmentEventSource {
+  carrier
+  admin
+  system
+}
+
+enum ImportRunStatus {
+  pending
+  running
+  completed
+  failed
+}
+
+enum ImportRecordStatus {
+  pending
+  imported
+  failed
+}
+
+enum InventoryMovementReason {
+  initial_stock
+  restock
+  sale
+  return
+  cancellation
+  adjustment
+  damage
+}
+
+enum MediaAssetStatus {
+  active
+  archived
+}
+
+enum MediaRole {
+  primary
+  gallery
+}
+
+enum OrderStatus {
+  created
+  confirmed
+  processing
+  shipped
+  out_for_delivery
+  delivered
+  cancelled
+  returned
+}
+
+enum OrderPaymentStatus {
+  pending
+  authorized
+  paid
+  failed
+  partially_refunded
+  refunded
+}
+
+enum OrderFulfillmentStatus {
+  unfulfilled
+  processing
+  partially_shipped
+  shipped
+  out_for_delivery
+  delivered
+  returned
+}
+
+enum OrderAddressType {
+  billing
+  shipping
+}
+
+enum OrderStatusHistorySource {
+  admin
+  system
+  carrier
+}
+
+enum PaymentOrderLifecycleStatus {
+  pending
+  created
+  attempted
+  paid
+  expired
+  cancelled
+}
+
+enum PaymentEventProcessingStatus {
+  pending
+  processed
+  failed
+  ignored
+}
+
+enum RefundStatus {
+  pending
+  processed
+  failed
+}
+
+enum RefundSpeedRequested {
+  normal
+  optimum
+}
+
+enum RefundSpeedProcessed {
+  normal
+  instant
+}
+
+enum ProductStatus {
+  draft
+  active
+  archived
+}
+
+enum ProductType {
+  simple
+  variable
+}
+
+enum ProductTaxStatus {
+  taxable
+  shipping
+  none
+}
+
+enum VariantStockStatus {
+  in_stock
+  out_of_stock
+}
+
+enum BackorderPolicy {
+  no
+  notify
+  allow
+}
+
+enum VariantStatus {
+  active
+  archived
+}
+
+enum InventoryReservationStatus {
+  reserved
+  released
+  consumed
+  expired
+}
+
+enum ReturnStatus {
+  requested
+  approved
+  rejected
+  received
+  completed
+  cancelled
+}
+
+enum ShippingMethodKind {
+  flat_rate
+  free_shipping
+}
+
+enum ShippingRequirement {
+  none
+  minimum_subtotal
+  coupon
+}
+
+model UserAddress {
+  id Uuid @id @default(uuid())
+  userId String
+  label String?
+  recipientName String
+  phone String?
+  addressLine1 String
+  addressLine2 String?
+  landmark String?
+  city String
+  state String
+  postalCode String
+  countryCode String @default("IN")
+  isPrimary Boolean @default(false)
+  createdAt TimestamptzString @default(now())
+  updatedAt temporal.updatedAtString()
+  user User @relation(fields: [userId], references: [id])
+}
+
+model AdminAuditLog {
+  id Uuid @id @default(uuid())
+  actorUserId String?
+  actorAdminRole AdminRole?
+  action String
+  entityType String
+  entityId String
+  outcome AdminAuditOutcome @default(success)
+  reason String?
+  beforeData Jsonb?
+  afterData Jsonb?
+  metadata Jsonb?
+  requestId String?
+  sessionId String?
+  ipAddress Inet?
+  userAgent String?
+  createdAt TimestamptzString @default(now())
+}
+
+model AdminInvitation {
+  id Uuid @id @default(uuid())
+  tokenHash String @unique
+  phoneNumber String
+  role AdminRole
+  invitedByUserId String
+  acceptedByUserId String?
+  expiresAt TimestamptzString
+  acceptedAt TimestamptzString?
+  revokedAt TimestamptzString?
+  createdAt TimestamptzString @default(now())
+}
+
+model AdminMembership {
+  userId String @id
+  role AdminRole @default(editor)
+  status AdminMembershipStatus @default(active)
+  createdAt TimestamptzString @default(now())
+  updatedAt temporal.updatedAtString()
+  user User @relation(fields: [userId], references: [id])
+}
+
+model Attribute {
+  id Uuid @id @default(uuid())
+  name String
+  slug String @unique
+  displayType AttributeDisplayType @default(select)
+  sortOrder Int @default(0)
+  status AttributeStatus @default(active)
+  createdAt TimestamptzString @default(now())
+  updatedAt temporal.updatedAtString()
+  attributeOptions AttributeOption[]
+  productAttributes ProductAttribute[]
+}
+
+model AttributeOption {
+  id Uuid @id @default(uuid())
+  attributeId Uuid
+  name String
+  slug String
+  swatchValue String?
+  sortOrder Int @default(0)
+  status AttributeStatus @default(active)
+  createdAt TimestamptzString @default(now())
+  updatedAt temporal.updatedAtString()
+  attribute Attribute @relation(fields: [attributeId], references: [id])
+  productAttributeOptions ProductAttributeOption[]
+  @@unique([attributeId, slug])
+}
+
+model AuthRateBucket {
+  key String @id
+  count Int
+  expiresAt TimestamptzString
+}
+
+model AuthEvent {
+  id Uuid @id @default(uuid())
+  action String
+  requestId Uuid
+  createdAt TimestamptzString @default(now())
+}
+
+model User {
+  id String @id
+  name String
+  email String @unique
+  emailVerified Boolean @default(false)
+  image String?
+  createdAt TimestamptzString @default(now())
+  updatedAt temporal.updatedAtString()
+  phoneNumber String? @unique
+  phoneNumberVerified Boolean?
+  role UserRole @default(customer)
+  userAddresses UserAddress[]
+  adminMembership AdminMembership?
+  sessions Session[]
+  accounts Account[]
+  carts Cart[]
+  couponRedemptions CouponRedemption[]
+  fulfillmentEvents FulfillmentEvent[]
+  inventoryMovements InventoryMovement[]
+  orders Order[]
+  orderStatusHistories OrderStatusHistory[]
+  orderNotes OrderNote[]
+  refunds Refund[]
+  returnRequests ReturnRequest[]
+}
+
+model Session {
+  id String @id
+  expiresAt TimestamptzString
+  token String @unique
+  createdAt TimestamptzString @default(now())
+  updatedAt temporal.updatedAtString()
+  ipAddress String?
+  userAgent String?
+  userId String
+  user User @relation(fields: [userId], references: [id])
+}
+
+model Account {
+  id String @id
+  accountId String
+  providerId String
+  userId String
+  accessToken String?
+  refreshToken String?
+  idToken String?
+  accessTokenExpiresAt TimestamptzString?
+  refreshTokenExpiresAt TimestamptzString?
+  scope String?
+  password String?
+  createdAt TimestamptzString @default(now())
+  updatedAt temporal.updatedAtString()
+  user User @relation(fields: [userId], references: [id])
+  @@unique([providerId, accountId])
+}
+
+model Verification {
+  id String @id
+  identifier String
+  value String
+  expiresAt TimestamptzString
+  createdAt TimestamptzString @default(now())
+  updatedAt temporal.updatedAtString()
+}
+
+model Cart {
+  id Uuid @id @default(uuid())
+  userId String
+  status CartStatus @default(active)
+  convertedOrderId Uuid? @unique
+  expiresAt TimestamptzString
+  createdAt TimestamptzString @default(now())
+  updatedAt temporal.updatedAtString()
+  user User @relation(fields: [userId], references: [id])
+  convertedOrder Order? @relation(fields: [convertedOrderId], references: [id])
+  cartItems CartItem[]
+}
+
+model CartItem {
+  id Uuid @id @default(uuid())
+  cartId Uuid
+  variantId Uuid
+  quantity Int
+  createdAt TimestamptzString @default(now())
+  updatedAt temporal.updatedAtString()
+  cart Cart @relation(fields: [cartId], references: [id])
+  variant ProductVariant @relation(fields: [variantId], references: [id])
+  @@unique([cartId, variantId])
+}
+
+model CategoryProduct {
+  categoryId Uuid
+  productId Uuid
+  sortOrder Int @default(0)
+  category Category @relation(fields: [categoryId], references: [id])
+  product Product @relation(fields: [productId], references: [id])
+  @@id([categoryId, productId])
+}
+
+model Category {
+  id Uuid @id @default(uuid())
+  parentId Uuid?
+  name String
+  slug String @unique
+  description String?
+  sortOrder Int @default(0)
+  status CategoryStatus @default(active)
+  createdAt TimestamptzString @default(now())
+  updatedAt temporal.updatedAtString()
+  parent Category? @relation("CategoryTree", fields: [parentId], references: [id])
+  categoryProducts CategoryProduct[]
+  navigationMenuItems NavigationMenuItem[]
+  children Category[] @relation("CategoryTree")
+}
+
+model ContentEntry {
+  id Uuid @id @default(uuid())
+  sourcePostId String? @unique
+  title String
+  kind ContentEntryKind @default(page)
+  placement String? @unique
+  slug String @unique
+  status ContentEntryStatus @default(draft)
+  bodyHtml String @default("")
+  sourceLayout Jsonb?
+  publishedAt TimestamptzString?
+  createdAt TimestamptzString @default(now())
+  updatedAt temporal.updatedAtString()
+  navigationMenuItems NavigationMenuItem[]
+}
+
+model NavigationMenu {
+  id Uuid @id @default(uuid())
+  sourceTermId String? @unique
+  name String
+  slug String @unique
+  location String? @unique
+  createdAt TimestamptzString @default(now())
+  updatedAt temporal.updatedAtString()
+  navigationMenuItems NavigationMenuItem[]
+}
+
+model NavigationMenuItem {
+  id Uuid @id @default(uuid())
+  sourcePostId String? @unique
+  menuId Uuid
+  categoryId Uuid?
+  contentEntryId Uuid?
+  url String?
+  label String
+  sortOrder Int @default(0)
+  createdAt TimestamptzString @default(now())
+  updatedAt temporal.updatedAtString()
+  menu NavigationMenu @relation(fields: [menuId], references: [id])
+  category Category? @relation(fields: [categoryId], references: [id])
+  contentEntry ContentEntry? @relation(fields: [contentEntryId], references: [id])
+}
+
+model Coupon {
+  id Uuid @id @default(uuid())
+  code String @unique
+  kind DiscountKind
+  value Numeric(12, 2)
+  minimumSubtotal Numeric(12, 2) @default(0)
+  maximumDiscount Numeric(12, 2)?
+  usageLimit Int?
+  perUserLimit Int @default(1)
+  startsAt TimestamptzString @default(now())
+  expiresAt TimestamptzString?
+  archivedAt TimestamptzString?
+  createdAt TimestamptzString @default(now())
+  updatedAt temporal.updatedAtString()
+  couponRedemptions CouponRedemption[]
+  couponShippingBenefit CouponShippingBenefit?
+}
+
+model CouponRedemption {
+  id Uuid @id @default(uuid())
+  couponId Uuid
+  orderId Uuid @unique
+  userId String
+  discountAmount Numeric(12, 2)
+  createdAt TimestamptzString @default(now())
+  coupon Coupon @relation(fields: [couponId], references: [id])
+  order Order @relation(fields: [orderId], references: [id])
+  user User @relation(fields: [userId], references: [id])
+}
+
+model CheckoutFeeRule {
+  id Uuid @id @default(uuid())
+  sourcePostId String? @unique
+  name String
+  paymentMethod String @default("cod")
+  amount Numeric(12, 2)
+  currencyCode String @default("INR")
+  taxable Boolean @default(false)
+  optional Boolean @default(false)
+  enabled Boolean @default(false)
+  createdAt TimestamptzString @default(now())
+  updatedAt temporal.updatedAtString()
+}
+
+model OrderFee {
+  id Uuid @id @default(uuid())
+  orderId Uuid
+  sourceOrderItemId String? @unique
+  name String
+  amount Numeric(12, 2)
+  taxAmount Numeric(12, 2) @default(0)
+  currencyCode String @default("INR")
+  createdAt TimestamptzString @default(now())
+  order Order @relation(fields: [orderId], references: [id])
+}
+
+model Fulfillment {
+  id Uuid @id @default(uuid())
+  orderId Uuid
+  status FulfillmentStatus @default(pending)
+  carrier String?
+  trackingNumber String?
+  trackingUrl String?
+  estimatedDeliveryAt TimestamptzString?
+  shippedAt TimestamptzString?
+  deliveredAt TimestamptzString?
+  failureReason String?
+  createdAt TimestamptzString @default(now())
+  updatedAt temporal.updatedAtString()
+  order Order @relation(fields: [orderId], references: [id])
+  fulfillmentItems FulfillmentItem[]
+  fulfillmentEvents FulfillmentEvent[]
+}
+
+model FulfillmentItem {
+  orderId Uuid
+  fulfillmentId Uuid
+  orderItemId Uuid
+  quantity Int
+  fulfillment Fulfillment @relation(fields: [fulfillmentId], references: [id])
+  orderItem OrderItem @relation(fields: [orderItemId], references: [id])
+  @@id([fulfillmentId, orderItemId])
+}
+
+model FulfillmentEvent {
+  id Uuid @id @default(uuid())
+  fulfillmentId Uuid
+  status FulfillmentStatus
+  source FulfillmentEventSource @default(carrier)
+  provider String?
+  providerStatus String?
+  description String?
+  location String?
+  externalEventId String?
+  rawPayload Jsonb?
+  occurredAt TimestamptzString @default(now())
+  createdAt TimestamptzString @default(now())
+  createdByUserId String?
+  fulfillment Fulfillment @relation(fields: [fulfillmentId], references: [id])
+  createdByUser User? @relation(fields: [createdByUserId], references: [id])
+}
+
+model ImportRun {
+  id Uuid @id @default(uuid())
+  sourceSystem String
+  sourceRunId String?
+  entityType String
+  sourceFileName String?
+  status ImportRunStatus @default(pending)
+  startedAt TimestamptzString?
+  completedAt TimestamptzString?
+  createdAt TimestamptzString @default(now())
+  updatedAt temporal.updatedAtString()
+  importRecords ImportRecord[]
+  @@unique([sourceSystem, sourceRunId])
+}
+
+model ImportRecord {
+  id Uuid @id @default(uuid())
+  importRunId Uuid?
+  sourceSystem String
+  sourceTable String
+  sourceId String
+  sourceImportKey String?
+  targetTable String?
+  targetId String?
+  status ImportRecordStatus @default(pending)
+  createdAt TimestamptzString @default(now())
+  updatedAt temporal.updatedAtString()
+  importRun ImportRun? @relation(fields: [importRunId], references: [id])
+  @@unique([sourceSystem, sourceTable, sourceId])
+}
+
+model InventoryLevel {
+  id Uuid @id @default(uuid())
+  variantId Uuid @unique
+  quantityOnHand Int @default(0)
+  quantityReserved Int @default(0)
+  reorderPoint Int @default(0)
+  createdAt TimestamptzString @default(now())
+  updatedAt temporal.updatedAtString()
+  variant ProductVariant @relation(fields: [variantId], references: [id])
+}
+
+model InventoryMovement {
+  id Uuid @id @default(uuid())
+  variantId Uuid
+  idempotencyKey String @unique
+  quantityDelta Int
+  quantityAfter Int
+  reason InventoryMovementReason
+  referenceType String?
+  referenceId String?
+  note String?
+  actorUserId String?
+  createdAt TimestamptzString @default(now())
+  variant ProductVariant @relation(fields: [variantId], references: [id])
+  actorUser User? @relation(fields: [actorUserId], references: [id])
+}
+
+model MediaAsset {
+  id Uuid @id @default(uuid())
+  storageKey String @unique
+  originalFileName String
+  mimeType String
+  fileSizeBytes BigIntNumber
+  width Int?
+  height Int?
+  altText String?
+  status MediaAssetStatus @default(active)
+  createdAt TimestamptzString @default(now())
+  updatedAt temporal.updatedAtString()
+  productMedia ProductMedia[]
+}
+
+model ProductMedia {
+  productId Uuid
+  mediaAssetId Uuid
+  role MediaRole @default(gallery)
+  sortOrder Int @default(0)
+  createdAt TimestamptzString @default(now())
+  updatedAt temporal.updatedAtString()
+  product Product @relation(fields: [productId], references: [id])
+  mediaAsset MediaAsset @relation(fields: [mediaAssetId], references: [id])
+  @@id([productId, mediaAssetId])
+}
+
+model Order {
+  id Uuid @id @default(uuid())
+  orderNumber String @unique
+  userId String
+  status OrderStatus @default(created)
+  paymentStatus OrderPaymentStatus @default(pending)
+  fulfillmentStatus OrderFulfillmentStatus @default(unfulfilled)
+  currencyCode String @default("INR")
+  subtotalAmount Numeric(12, 2) @default(0)
+  discountAmount Numeric(12, 2) @default(0)
+  taxAmount Numeric(12, 2) @default(0)
+  shippingAmount Numeric(12, 2) @default(0)
+  totalAmount Numeric(12, 2) @default(0)
+  billingEmail String
+  customerNote String?
+  sourceOrderId String?
+  placedAt TimestamptzString?
+  paidAt TimestamptzString?
+  completedAt TimestamptzString?
+  cancelledAt TimestamptzString?
+  cancelledReason String?
+  createdAt TimestamptzString @default(now())
+  updatedAt temporal.updatedAtString()
+  user User @relation(fields: [userId], references: [id])
+  cart Cart?
+  couponRedemption CouponRedemption?
+  orderFees OrderFee[]
+  fulfillments Fulfillment[]
+  orderItems OrderItem[]
+  orderAddresses OrderAddress[]
+  orderStatusHistories OrderStatusHistory[]
+  orderNotes OrderNote[]
+  paymentOrders PaymentOrder[]
+  inventoryReservations InventoryReservation[]
+  returnRequests ReturnRequest[]
+}
+
+model OrderItem {
+  id Uuid @id @default(uuid())
+  orderId Uuid
+  productId Uuid?
+  variantId Uuid?
+  productNameSnapshot String
+  variantNameSnapshot String
+  skuSnapshot String
+  variantOptionsSnapshot Jsonb?
+  quantity Int
+  unitPrice Numeric(12, 2)
+  discountAmount Numeric(12, 2) @default(0)
+  taxAmount Numeric(12, 2) @default(0)
+  shippingAmount Numeric(12, 2) @default(0)
+  totalAmount Numeric(12, 2) @default(0)
+  createdAt TimestamptzString @default(now())
+  order Order @relation(fields: [orderId], references: [id])
+  product Product? @relation(fields: [productId], references: [id])
+  variant ProductVariant? @relation(fields: [variantId], references: [id])
+  fulfillmentItems FulfillmentItem[]
+  inventoryReservations InventoryReservation[]
+}
+
+model OrderAddress {
+  id Uuid @id @default(uuid())
+  orderId Uuid
+  addressType OrderAddressType
+  recipientName String
+  phone String?
+  addressLine1 String
+  addressLine2 String?
+  landmark String?
+  city String
+  state String
+  postalCode String
+  countryCode String @default("IN")
+  createdAt TimestamptzString @default(now())
+  order Order @relation(fields: [orderId], references: [id])
+  @@unique([orderId, addressType])
+}
+
+model OrderStatusHistory {
+  id Uuid @id @default(uuid())
+  orderId Uuid
+  fromStatus OrderStatus?
+  toStatus OrderStatus
+  source OrderStatusHistorySource @default(system)
+  provider String?
+  changedByUserId String?
+  note String?
+  metadata Jsonb?
+  externalEventId String?
+  occurredAt TimestamptzString @default(now())
+  createdAt TimestamptzString @default(now())
+  order Order @relation(fields: [orderId], references: [id])
+  changedByUser User? @relation(fields: [changedByUserId], references: [id])
+}
+
+model OrderNote {
+  id Uuid @id @default(uuid())
+  orderId Uuid
+  authorUserId String?
+  note String
+  createdAt TimestamptzString @default(now())
+  order Order @relation(fields: [orderId], references: [id])
+  authorUser User? @relation(fields: [authorUserId], references: [id])
+}
+
+model OutboxEvent {
+  id Uuid @id @default(uuid())
+  eventType String
+  idempotencyKey String @unique
+  payload Jsonb
+  attemptCount Int @default(0)
+  availableAt TimestamptzString @default(now())
+  leaseToken Uuid?
+  leasedUntil TimestamptzString?
+  publishedAt TimestamptzString?
+  lastError String?
+  createdAt TimestamptzString @default(now())
+}
+
+model PaymentOrder {
+  id Uuid @id @default(uuid())
+  orderId Uuid
+  provider String @default("razorpay")
+  idempotencyKey String
+  providerOrderId String?
+  receipt String
+  amountMinor BigIntNumber
+  currencyCode String @default("INR")
+  status PaymentOrderLifecycleStatus @default(pending)
+  providerStatus String?
+  providerAmountPaidMinor BigIntNumber?
+  providerAmountDueMinor BigIntNumber?
+  providerAttempts Int @default(0)
+  providerCreatedAt TimestamptzString?
+  createdAt TimestamptzString @default(now())
+  updatedAt temporal.updatedAtString()
+  order Order @relation(fields: [orderId], references: [id])
+  payments Payment[]
+  paymentEvents PaymentEvent[]
+  @@unique([provider, idempotencyKey])
+}
+
+model Payment {
+  id Uuid @id @default(uuid())
+  paymentOrderId Uuid
+  provider String @default("razorpay")
+  providerPaymentId String
+  status String
+  amountMinor BigIntNumber
+  currencyCode String
+  paymentMethod String?
+  amountRefundedMinor BigIntNumber @default(0)
+  refundStatus String?
+  feeMinor BigIntNumber?
+  taxMinor BigIntNumber?
+  errorCode String?
+  errorDescription String?
+  errorReason String?
+  errorSource String?
+  errorStep String?
+  capturedAt TimestamptzString?
+  providerCreatedAt TimestamptzString?
+  createdAt TimestamptzString @default(now())
+  updatedAt temporal.updatedAtString()
+  paymentOrder PaymentOrder @relation(fields: [paymentOrderId], references: [id])
+  paymentEvents PaymentEvent[]
+  refunds Refund[]
+  @@unique([provider, providerPaymentId])
+}
+
+model PaymentEvent {
+  id Uuid @id @default(uuid())
+  provider String @default("razorpay")
+  providerEventId String
+  eventType String
+  paymentOrderId Uuid?
+  paymentId Uuid?
+  providerOrderId String?
+  providerPaymentId String?
+  payload Jsonb
+  processingStatus PaymentEventProcessingStatus @default(pending)
+  processingError String?
+  attemptCount Int @default(0)
+  providerOccurredAt TimestamptzString?
+  receivedAt TimestamptzString @default(now())
+  processedAt TimestamptzString?
+  nextAttemptAt TimestamptzString @default(now())
+  createdAt TimestamptzString @default(now())
+  paymentOrder PaymentOrder? @relation(fields: [paymentOrderId], references: [id])
+  payment Payment? @relation(fields: [paymentId], references: [id])
+  @@unique([provider, providerEventId])
+}
+
+model Refund {
+  id Uuid @id @default(uuid())
+  paymentId Uuid
+  provider String @default("razorpay")
+  providerRefundId String?
+  idempotencyKey String
+  amountMinor BigIntNumber
+  currencyCode String
+  status RefundStatus @default(pending)
+  speedRequested RefundSpeedRequested @default(normal)
+  speedProcessed RefundSpeedProcessed?
+  providerReceipt String?
+  acquirerReference String?
+  reason String?
+  failureReason String?
+  requestedByUserId String?
+  requestedAt TimestamptzString @default(now())
+  providerCreatedAt TimestamptzString?
+  processedAt TimestamptzString?
+  createdAt TimestamptzString @default(now())
+  updatedAt temporal.updatedAtString()
+  payment Payment @relation(fields: [paymentId], references: [id])
+  requestedByUser User? @relation(fields: [requestedByUserId], references: [id])
+  @@unique([provider, idempotencyKey])
+}
+
+model ProductAttribute {
+  productId Uuid
+  attributeId Uuid
+  sortOrder Int @default(0)
+  useForVariants Boolean @default(false)
+  product Product @relation(fields: [productId], references: [id])
+  attribute Attribute @relation(fields: [attributeId], references: [id])
+  @@id([productId, attributeId])
+}
+
+model ProductAttributeOption {
+  productId Uuid
+  attributeId Uuid
+  attributeOptionId Uuid
+  product Product @relation(fields: [productId], references: [id])
+  attributeOption AttributeOption @relation(fields: [attributeOptionId], references: [id])
+  @@id([productId, attributeOptionId])
+}
+
+model VariantAttributeOption {
+  productId Uuid
+  variantId Uuid
+  attributeId Uuid
+  attributeOptionId Uuid
+  variant ProductVariant @relation(fields: [variantId], references: [id])
+  @@id([variantId, attributeId])
+}
+
+model ProductTag {
+  id Uuid @id @default(uuid())
+  sourceTermId String? @unique
+  name String
+  slug String @unique
+  description String?
+  createdAt TimestamptzString @default(now())
+  updatedAt temporal.updatedAtString()
+  productTagLinks ProductTagLink[]
+}
+
+model ProductTagLink {
+  productId Uuid
+  tagId Uuid
+  product Product @relation(fields: [productId], references: [id])
+  tag ProductTag @relation(fields: [tagId], references: [id])
+  @@id([productId, tagId])
+}
+
+model Product {
+  id Uuid @id @default(uuid())
+  name String
+  slug String @unique
+  description String?
+  shortDescription String?
+  status ProductStatus @default(draft)
+  productType ProductType @default(simple)
+  taxStatus ProductTaxStatus @default(taxable)
+  taxClass String?
+  publishedAt TimestamptzString?
+  archivedAt TimestamptzString?
+  createdAt TimestamptzString @default(now())
+  updatedAt temporal.updatedAtString()
+  categoryProducts CategoryProduct[]
+  productMedia ProductMedia[]
+  orderItems OrderItem[]
+  productAttributes ProductAttribute[]
+  productAttributeOptions ProductAttributeOption[]
+  productTagLinks ProductTagLink[]
+  productVariants ProductVariant[]
+}
+
+model ProductVariant {
+  id Uuid @id @default(uuid())
+  productId Uuid
+  name String @default("Default")
+  sku String @unique
+  regularPrice Numeric(12, 2)
+  salePrice Numeric(12, 2)?
+  currencyCode String @default("INR")
+  saleStartsAt TimestamptzString?
+  saleEndsAt TimestamptzString?
+  stockStatus VariantStockStatus @default(in_stock)
+  manageStock Boolean @default(false)
+  backorderPolicy BackorderPolicy @default(no)
+  weight Numeric(10, 3)?
+  length Numeric(10, 3)?
+  width Numeric(10, 3)?
+  height Numeric(10, 3)?
+  isDefault Boolean @default(false)
+  status VariantStatus @default(active)
+  createdAt TimestamptzString @default(now())
+  updatedAt temporal.updatedAtString()
+  archivedAt TimestamptzString?
+  product Product @relation(fields: [productId], references: [id])
+  cartItems CartItem[]
+  inventoryLevel InventoryLevel?
+  inventoryMovements InventoryMovement[]
+  orderItems OrderItem[]
+  variantAttributeOptions VariantAttributeOption[]
+  inventoryReservations InventoryReservation[]
+}
+
+model InventoryReservation {
+  id Uuid @id @default(uuid())
+  orderId Uuid
+  orderItemId Uuid
+  variantId Uuid
+  quantity Int
+  quantityConsumed Int @default(0)
+  status InventoryReservationStatus @default(reserved)
+  expiresAt TimestamptzString?
+  releasedAt TimestamptzString?
+  consumedAt TimestamptzString?
+  createdAt TimestamptzString @default(now())
+  updatedAt temporal.updatedAtString()
+  order Order @relation(fields: [orderId], references: [id])
+  orderItem OrderItem @relation(fields: [orderItemId], references: [id])
+  variant ProductVariant @relation(fields: [variantId], references: [id])
+}
+
+model ReturnRequest {
+  id Uuid @id @default(uuid())
+  orderId Uuid
+  status ReturnStatus @default(requested)
+  reason String
+  requestedByUserId String?
+  idempotencyKey String @unique
+  receivedAt TimestamptzString?
+  createdAt TimestamptzString @default(now())
+  updatedAt temporal.updatedAtString()
+  order Order @relation(fields: [orderId], references: [id])
+  requestedByUser User? @relation(fields: [requestedByUserId], references: [id])
+}
+
+model ReturnItem {
+  id Uuid @id @default(uuid())
+  orderId Uuid
+  returnRequestId Uuid
+  orderItemId Uuid
+  quantity Int
+  restockedQuantity Int @default(0)
+  @@unique([returnRequestId, orderItemId])
+}
+
+model ShippingZone {
+  id Uuid @id @default(uuid())
+  sourceZoneId String? @unique
+  name String
+  sortOrder Int @default(0)
+  enabled Boolean @default(false)
+  createdAt TimestamptzString @default(now())
+  updatedAt temporal.updatedAtString()
+  shippingMethods ShippingMethod[]
+}
+
+model ShippingMethod {
+  id Uuid @id @default(uuid())
+  zoneId Uuid
+  sourceInstanceId String? @unique
+  kind ShippingMethodKind
+  title String
+  enabled Boolean @default(false)
+  sortOrder Int @default(0)
+  currencyCode String @default("INR")
+  cost Numeric(12, 2) @default(0)
+  requirement ShippingRequirement @default(none)
+  minimumSubtotal Numeric(12, 2)?
+  ignoreDiscounts Boolean @default(false)
+  taxable Boolean @default(false)
+  createdAt TimestamptzString @default(now())
+  updatedAt temporal.updatedAtString()
+  zone ShippingZone @relation(fields: [zoneId], references: [id])
+}
+
+model CouponShippingBenefit {
+  couponId Uuid @id
+  freeShipping Boolean @default(false)
+  createdAt TimestamptzString @default(now())
+  updatedAt temporal.updatedAtString()
+  coupon Coupon @relation(fields: [couponId], references: [id])
+}
