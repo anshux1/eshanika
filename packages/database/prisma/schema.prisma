@@ -29,29 +29,29 @@ model UserAddress {
 }
 
 model AdminAuditLog {
-  id             String   @id @default(uuid()) @db.Uuid
+  id             String            @id @default(uuid()) @db.Uuid
   actorUserId    String?
-  actorAdminRole String?
+  actorAdminRole AdminRole?
   action         String
   entityType     String
   entityId       String
-  outcome        String   @default("success")
+  outcome        AdminAuditOutcome @default(success)
   reason         String?
-  beforeData     Json?    @db.JsonB
-  afterData      Json?    @db.JsonB
-  metadata       Json?    @db.JsonB
+  beforeData     Json?             @db.JsonB
+  afterData      Json?             @db.JsonB
+  metadata       Json?             @db.JsonB
   requestId      String?
   sessionId      String?
-  ipAddress      String?  @db.Inet
+  ipAddress      String?           @db.Inet
   userAgent      String?
-  createdAt      DateTime @default(now()) @db.Timestamptz(6)
+  createdAt      DateTime          @default(now()) @db.Timestamptz(6)
 }
 
 model AdminInvitation {
   id               String    @id @default(uuid()) @db.Uuid
   tokenHash        String    @unique
   phoneNumber      String
-  role             String
+  role             AdminRole
   invitedByUserId  String
   acceptedByUserId String?
   expiresAt        DateTime  @db.Timestamptz(6)
@@ -61,25 +61,26 @@ model AdminInvitation {
 }
 
 model AdminMembership {
-  userId    String   @id
-  role      String   @default("editor")
-  status    String   @default("active")
-  createdAt DateTime @default(now()) @db.Timestamptz(6)
-  updatedAt DateTime @updatedAt @db.Timestamptz(6)
-  user      User     @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  userId    String                @id
+  role      AdminRole             @default(editor)
+  status    AdminMembershipStatus @default(active)
+  createdAt DateTime              @default(now()) @db.Timestamptz(6)
+  updatedAt DateTime              @updatedAt @db.Timestamptz(6)
+  user      User                  @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction)
 }
 
 model Attribute {
-  id                String             @id @default(uuid()) @db.Uuid
-  name              String
-  slug              String             @unique
-  displayType       String             @default("select")
-  sortOrder         Int                @default(0)
-  status            String             @default("active")
-  createdAt         DateTime           @default(now()) @db.Timestamptz(6)
-  updatedAt         DateTime           @updatedAt @db.Timestamptz(6)
-  attributeOptions  AttributeOption[]
-  productAttributes ProductAttribute[]
+  id                      String                   @id @default(uuid()) @db.Uuid
+  name                    String
+  slug                    String                   @unique
+  displayType             AttributeDisplayType     @default(select)
+  sortOrder               Int                      @default(0)
+  status                  AttributeStatus          @default(active)
+  createdAt               DateTime                 @default(now()) @db.Timestamptz(6)
+  updatedAt               DateTime                 @updatedAt @db.Timestamptz(6)
+  attributeOptions        AttributeOption[]
+  productAttributes       ProductAttribute[]
+  productAttributeOptions ProductAttributeOption[]
 }
 
 model AttributeOption {
@@ -89,11 +90,12 @@ model AttributeOption {
   slug                    String
   swatchValue             String?
   sortOrder               Int                      @default(0)
-  status                  String                   @default("active")
+  status                  AttributeStatus          @default(active)
   createdAt               DateTime                 @default(now()) @db.Timestamptz(6)
   updatedAt               DateTime                 @updatedAt @db.Timestamptz(6)
   attribute               Attribute                @relation(fields: [attributeId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   productAttributeOptions ProductAttributeOption[]
+  variantAttributeOptions VariantAttributeOption[]
 
   @@unique([attributeId, slug])
   @@index([attributeId], map: "AttributeOption_attributeId_idx_58ec5fae")
@@ -122,7 +124,7 @@ model User {
   updatedAt            DateTime             @updatedAt @db.Timestamptz(6)
   phoneNumber          String?              @unique
   phoneNumberVerified  Boolean?
-  role                 String               @default("customer")
+  role                 UserRole             @default(customer)
   userAddresses        UserAddress[]
   adminMembership      AdminMembership?
   sessions             Session[]
@@ -184,7 +186,7 @@ model Verification {
 model Cart {
   id               String     @id @default(uuid()) @db.Uuid
   userId           String
-  status           String     @default("active")
+  status           CartStatus @default(active)
   convertedOrderId String?    @unique @db.Uuid
   expiresAt        DateTime   @db.Timestamptz(6)
   createdAt        DateTime   @default(now()) @db.Timestamptz(6)
@@ -230,7 +232,7 @@ model Category {
   slug                String               @unique
   description         String?
   sortOrder           Int                  @default(0)
-  status              String               @default("active")
+  status              CategoryStatus       @default(active)
   createdAt           DateTime             @default(now()) @db.Timestamptz(6)
   updatedAt           DateTime             @updatedAt @db.Timestamptz(6)
   parent              Category?            @relation("CategoryTree", fields: [parentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
@@ -243,14 +245,12 @@ model Category {
 
 model ContentEntry {
   id                  String               @id @default(uuid()) @db.Uuid
-  sourcePostId        String?              @unique
   title               String
-  kind                String               @default("page")
+  kind                ContentEntryKind     @default(page)
   placement           String?              @unique
   slug                String               @unique
-  status              String               @default("draft")
+  status              ContentEntryStatus   @default(draft)
   bodyHtml            String               @default("")
-  sourceLayout        Json?                @db.JsonB
   publishedAt         DateTime?            @db.Timestamptz(6)
   createdAt           DateTime             @default(now()) @db.Timestamptz(6)
   updatedAt           DateTime             @updatedAt @db.Timestamptz(6)
@@ -259,7 +259,6 @@ model ContentEntry {
 
 model NavigationMenu {
   id                  String               @id @default(uuid()) @db.Uuid
-  sourceTermId        String?              @unique
   name                String
   slug                String               @unique
   location            String?              @unique
@@ -270,7 +269,6 @@ model NavigationMenu {
 
 model NavigationMenuItem {
   id             String         @id @default(uuid()) @db.Uuid
-  sourcePostId   String?        @unique
   menuId         String         @db.Uuid
   categoryId     String?        @db.Uuid
   contentEntryId String?        @db.Uuid
@@ -291,7 +289,7 @@ model NavigationMenuItem {
 model Coupon {
   id                    String                 @id @default(uuid()) @db.Uuid
   code                  String                 @unique
-  kind                  String
+  kind                  DiscountKind
   value                 Decimal                @db.Decimal(12, 2)
   minimumSubtotal       Decimal                @default(0) @db.Decimal(12, 2)
   maximumDiscount       Decimal?               @db.Decimal(12, 2)
@@ -323,7 +321,6 @@ model CouponRedemption {
 
 model CheckoutFeeRule {
   id            String   @id @default(uuid()) @db.Uuid
-  sourcePostId  String?  @unique
   name          String
   paymentMethod String   @default("cod")
   amount        Decimal  @db.Decimal(12, 2)
@@ -336,15 +333,14 @@ model CheckoutFeeRule {
 }
 
 model OrderFee {
-  id                String   @id @default(uuid()) @db.Uuid
-  orderId           String   @db.Uuid
-  sourceOrderItemId String?  @unique
-  name              String
-  amount            Decimal  @db.Decimal(12, 2)
-  taxAmount         Decimal  @default(0) @db.Decimal(12, 2)
-  currencyCode      String   @default("INR")
-  createdAt         DateTime @default(now()) @db.Timestamptz(6)
-  order             Order    @relation(fields: [orderId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  id           String   @id @default(uuid()) @db.Uuid
+  orderId      String   @db.Uuid
+  name         String
+  amount       Decimal  @db.Decimal(12, 2)
+  taxAmount    Decimal  @default(0) @db.Decimal(12, 2)
+  currencyCode String   @default("INR")
+  createdAt    DateTime @default(now()) @db.Timestamptz(6)
+  order        Order    @relation(fields: [orderId], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
   @@index([orderId], map: "OrderFee_orderId_idx_d284871b")
 }
@@ -352,7 +348,7 @@ model OrderFee {
 model Fulfillment {
   id                  String             @id @default(uuid()) @db.Uuid
   orderId             String             @db.Uuid
-  status              String             @default("pending")
+  status              FulfillmentStatus  @default(pending)
   carrier             String?
   trackingNumber      String?
   trackingUrl         String?
@@ -383,58 +379,24 @@ model FulfillmentItem {
 }
 
 model FulfillmentEvent {
-  id              String      @id @default(uuid()) @db.Uuid
-  fulfillmentId   String      @db.Uuid
-  status          String
-  source          String      @default("carrier")
+  id              String                 @id @default(uuid()) @db.Uuid
+  fulfillmentId   String                 @db.Uuid
+  status          FulfillmentStatus
+  source          FulfillmentEventSource @default(carrier)
   provider        String?
   providerStatus  String?
   description     String?
   location        String?
   externalEventId String?
-  rawPayload      Json?       @db.JsonB
-  occurredAt      DateTime    @default(now()) @db.Timestamptz(6)
-  createdAt       DateTime    @default(now()) @db.Timestamptz(6)
+  rawPayload      Json?                  @db.JsonB
+  occurredAt      DateTime               @default(now()) @db.Timestamptz(6)
+  createdAt       DateTime               @default(now()) @db.Timestamptz(6)
   createdByUserId String?
-  fulfillment     Fulfillment @relation(fields: [fulfillmentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  createdByUser   User?       @relation(fields: [createdByUserId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  fulfillment     Fulfillment            @relation(fields: [fulfillmentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  createdByUser   User?                  @relation(fields: [createdByUserId], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
   @@index([createdByUserId], map: "FulfillmentEvent_createdByUserId_idx_93e8a540")
   @@index([fulfillmentId], map: "FulfillmentEvent_fulfillmentId_idx_b6c1e5d8")
-}
-
-model ImportRun {
-  id             String         @id @default(uuid()) @db.Uuid
-  sourceSystem   String
-  sourceRunId    String?
-  entityType     String
-  sourceFileName String?
-  status         String         @default("pending")
-  startedAt      DateTime?      @db.Timestamptz(6)
-  completedAt    DateTime?      @db.Timestamptz(6)
-  createdAt      DateTime       @default(now()) @db.Timestamptz(6)
-  updatedAt      DateTime       @updatedAt @db.Timestamptz(6)
-  importRecords  ImportRecord[]
-
-  @@unique([sourceSystem, sourceRunId])
-}
-
-model ImportRecord {
-  id              String     @id @default(uuid()) @db.Uuid
-  importRunId     String?    @db.Uuid
-  sourceSystem    String
-  sourceTable     String
-  sourceId        String
-  sourceImportKey String?
-  targetTable     String?
-  targetId        String?
-  status          String     @default("pending")
-  createdAt       DateTime   @default(now()) @db.Timestamptz(6)
-  updatedAt       DateTime   @updatedAt @db.Timestamptz(6)
-  importRun       ImportRun? @relation(fields: [importRunId], references: [id], onDelete: NoAction, onUpdate: NoAction)
-
-  @@unique([sourceSystem, sourceTable, sourceId])
-  @@index([importRunId], map: "ImportRecord_importRunId_idx_99a94f3f")
 }
 
 model InventoryLevel {
@@ -449,43 +411,43 @@ model InventoryLevel {
 }
 
 model InventoryMovement {
-  id             String         @id @default(uuid()) @db.Uuid
-  variantId      String         @db.Uuid
-  idempotencyKey String         @unique
+  id             String                  @id @default(uuid()) @db.Uuid
+  variantId      String                  @db.Uuid
+  idempotencyKey String                  @unique
   quantityDelta  Int
   quantityAfter  Int
-  reason         String
+  reason         InventoryMovementReason
   referenceType  String?
   referenceId    String?
   note           String?
   actorUserId    String?
-  createdAt      DateTime       @default(now()) @db.Timestamptz(6)
-  variant        ProductVariant @relation(fields: [variantId], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  actorUser      User?          @relation(fields: [actorUserId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  createdAt      DateTime                @default(now()) @db.Timestamptz(6)
+  variant        ProductVariant          @relation(fields: [variantId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  actorUser      User?                   @relation(fields: [actorUserId], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
   @@index([actorUserId], map: "InventoryMovement_actorUserId_idx_96dac96c")
   @@index([variantId], map: "InventoryMovement_variantId_idx_e16bb45d")
 }
 
 model MediaAsset {
-  id               String         @id @default(uuid()) @db.Uuid
-  storageKey       String         @unique
+  id               String           @id @default(uuid()) @db.Uuid
+  storageKey       String           @unique
   originalFileName String
   mimeType         String
   fileSizeBytes    BigInt
   width            Int?
   height           Int?
   altText          String?
-  status           String         @default("active")
-  createdAt        DateTime       @default(now()) @db.Timestamptz(6)
-  updatedAt        DateTime       @updatedAt @db.Timestamptz(6)
+  status           MediaAssetStatus @default(active)
+  createdAt        DateTime         @default(now()) @db.Timestamptz(6)
+  updatedAt        DateTime         @updatedAt @db.Timestamptz(6)
   productMedia     ProductMedia[]
 }
 
 model ProductMedia {
   productId    String     @db.Uuid
   mediaAssetId String     @db.Uuid
-  role         String     @default("gallery")
+  role         MediaRole  @default(gallery)
   sortOrder    Int        @default(0)
   createdAt    DateTime   @default(now()) @db.Timestamptz(6)
   updatedAt    DateTime   @updatedAt @db.Timestamptz(6)
@@ -501,9 +463,9 @@ model Order {
   id                    String                 @id @default(uuid()) @db.Uuid
   orderNumber           String                 @unique
   userId                String
-  status                String                 @default("created")
-  paymentStatus         String                 @default("pending")
-  fulfillmentStatus     String                 @default("unfulfilled")
+  status                OrderStatus            @default(created)
+  paymentStatus         OrderPaymentStatus     @default(pending)
+  fulfillmentStatus     OrderFulfillmentStatus @default(unfulfilled)
   currencyCode          String                 @default("INR")
   subtotalAmount        Decimal                @default(0) @db.Decimal(12, 2)
   discountAmount        Decimal                @default(0) @db.Decimal(12, 2)
@@ -512,7 +474,6 @@ model Order {
   totalAmount           Decimal                @default(0) @db.Decimal(12, 2)
   billingEmail          String
   customerNote          String?
-  sourceOrderId         String?
   placedAt              DateTime?              @db.Timestamptz(6)
   paidAt                DateTime?              @db.Timestamptz(6)
   completedAt           DateTime?              @db.Timestamptz(6)
@@ -557,6 +518,7 @@ model OrderItem {
   variant                ProductVariant?        @relation(fields: [variantId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   fulfillmentItems       FulfillmentItem[]
   inventoryReservations  InventoryReservation[]
+  returnItems            ReturnItem[]
 
   @@index([orderId], map: "OrderItem_orderId_idx_d284871b")
   @@index([productId], map: "OrderItem_productId_idx_5858600a")
@@ -564,9 +526,9 @@ model OrderItem {
 }
 
 model OrderAddress {
-  id            String   @id @default(uuid()) @db.Uuid
-  orderId       String   @db.Uuid
-  addressType   String
+  id            String           @id @default(uuid()) @db.Uuid
+  orderId       String           @db.Uuid
+  addressType   OrderAddressType
   recipientName String
   phone         String?
   addressLine1  String
@@ -575,29 +537,29 @@ model OrderAddress {
   city          String
   state         String
   postalCode    String
-  countryCode   String   @default("IN")
-  createdAt     DateTime @default(now()) @db.Timestamptz(6)
-  order         Order    @relation(fields: [orderId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  countryCode   String           @default("IN")
+  createdAt     DateTime         @default(now()) @db.Timestamptz(6)
+  order         Order            @relation(fields: [orderId], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
   @@unique([orderId, addressType])
   @@index([orderId], map: "OrderAddress_orderId_idx_d284871b")
 }
 
 model OrderStatusHistory {
-  id              String   @id @default(uuid()) @db.Uuid
-  orderId         String   @db.Uuid
-  fromStatus      String?
-  toStatus        String
-  source          String   @default("system")
+  id              String                   @id @default(uuid()) @db.Uuid
+  orderId         String                   @db.Uuid
+  fromStatus      OrderStatus?
+  toStatus        OrderStatus
+  source          OrderStatusHistorySource @default(system)
   provider        String?
   changedByUserId String?
   note            String?
-  metadata        Json?    @db.JsonB
+  metadata        Json?                    @db.JsonB
   externalEventId String?
-  occurredAt      DateTime @default(now()) @db.Timestamptz(6)
-  createdAt       DateTime @default(now()) @db.Timestamptz(6)
-  order           Order    @relation(fields: [orderId], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  changedByUser   User?    @relation(fields: [changedByUserId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  occurredAt      DateTime                 @default(now()) @db.Timestamptz(6)
+  createdAt       DateTime                 @default(now()) @db.Timestamptz(6)
+  order           Order                    @relation(fields: [orderId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  changedByUser   User?                    @relation(fields: [changedByUserId], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
   @@index([changedByUserId], map: "OrderStatusHistory_changedByUserId_idx_a776e8b0")
   @@index([orderId], map: "OrderStatusHistory_orderId_idx_d284871b")
@@ -631,23 +593,23 @@ model OutboxEvent {
 }
 
 model PaymentOrder {
-  id                      String         @id @default(uuid()) @db.Uuid
-  orderId                 String         @db.Uuid
-  provider                String         @default("razorpay")
+  id                      String                      @id @default(uuid()) @db.Uuid
+  orderId                 String                      @db.Uuid
+  provider                String                      @default("razorpay")
   idempotencyKey          String
   providerOrderId         String?
   receipt                 String
   amountMinor             BigInt
-  currencyCode            String         @default("INR")
-  status                  String         @default("pending")
+  currencyCode            String                      @default("INR")
+  status                  PaymentOrderLifecycleStatus @default(pending)
   providerStatus          String?
   providerAmountPaidMinor BigInt?
   providerAmountDueMinor  BigInt?
-  providerAttempts        Int            @default(0)
-  providerCreatedAt       DateTime?      @db.Timestamptz(6)
-  createdAt               DateTime       @default(now()) @db.Timestamptz(6)
-  updatedAt               DateTime       @updatedAt @db.Timestamptz(6)
-  order                   Order          @relation(fields: [orderId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  providerAttempts        Int                         @default(0)
+  providerCreatedAt       DateTime?                   @db.Timestamptz(6)
+  createdAt               DateTime                    @default(now()) @db.Timestamptz(6)
+  updatedAt               DateTime                    @updatedAt @db.Timestamptz(6)
+  order                   Order                       @relation(fields: [orderId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   payments                Payment[]
   paymentEvents           PaymentEvent[]
 
@@ -686,25 +648,25 @@ model Payment {
 }
 
 model PaymentEvent {
-  id                 String        @id @default(uuid()) @db.Uuid
-  provider           String        @default("razorpay")
+  id                 String                       @id @default(uuid()) @db.Uuid
+  provider           String                       @default("razorpay")
   providerEventId    String
   eventType          String
-  paymentOrderId     String?       @db.Uuid
-  paymentId          String?       @db.Uuid
+  paymentOrderId     String?                      @db.Uuid
+  paymentId          String?                      @db.Uuid
   providerOrderId    String?
   providerPaymentId  String?
-  payload            Json          @db.JsonB
-  processingStatus   String        @default("pending")
+  payload            Json                         @db.JsonB
+  processingStatus   PaymentEventProcessingStatus @default(pending)
   processingError    String?
-  attemptCount       Int           @default(0)
-  providerOccurredAt DateTime?     @db.Timestamptz(6)
-  receivedAt         DateTime      @default(now()) @db.Timestamptz(6)
-  processedAt        DateTime?     @db.Timestamptz(6)
-  nextAttemptAt      DateTime      @default(now()) @db.Timestamptz(6)
-  createdAt          DateTime      @default(now()) @db.Timestamptz(6)
-  paymentOrder       PaymentOrder? @relation(fields: [paymentOrderId], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  payment            Payment?      @relation(fields: [paymentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  attemptCount       Int                          @default(0)
+  providerOccurredAt DateTime?                    @db.Timestamptz(6)
+  receivedAt         DateTime                     @default(now()) @db.Timestamptz(6)
+  processedAt        DateTime?                    @db.Timestamptz(6)
+  nextAttemptAt      DateTime                     @default(now()) @db.Timestamptz(6)
+  createdAt          DateTime                     @default(now()) @db.Timestamptz(6)
+  paymentOrder       PaymentOrder?                @relation(fields: [paymentOrderId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  payment            Payment?                     @relation(fields: [paymentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
   @@unique([provider, providerEventId])
   @@index([paymentId], map: "PaymentEvent_paymentId_idx_b2fe9a10")
@@ -712,28 +674,28 @@ model PaymentEvent {
 }
 
 model Refund {
-  id                String    @id @default(uuid()) @db.Uuid
-  paymentId         String    @db.Uuid
-  provider          String    @default("razorpay")
+  id                String                @id @default(uuid()) @db.Uuid
+  paymentId         String                @db.Uuid
+  provider          String                @default("razorpay")
   providerRefundId  String?
   idempotencyKey    String
   amountMinor       BigInt
   currencyCode      String
-  status            String    @default("pending")
-  speedRequested    String    @default("normal")
-  speedProcessed    String?
+  status            RefundStatus          @default(pending)
+  speedRequested    RefundSpeedRequested  @default(normal)
+  speedProcessed    RefundSpeedProcessed?
   providerReceipt   String?
   acquirerReference String?
   reason            String?
   failureReason     String?
   requestedByUserId String?
-  requestedAt       DateTime  @default(now()) @db.Timestamptz(6)
-  providerCreatedAt DateTime? @db.Timestamptz(6)
-  processedAt       DateTime? @db.Timestamptz(6)
-  createdAt         DateTime  @default(now()) @db.Timestamptz(6)
-  updatedAt         DateTime  @updatedAt @db.Timestamptz(6)
-  payment           Payment   @relation(fields: [paymentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  requestedByUser   User?     @relation(fields: [requestedByUserId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  requestedAt       DateTime              @default(now()) @db.Timestamptz(6)
+  providerCreatedAt DateTime?             @db.Timestamptz(6)
+  processedAt       DateTime?             @db.Timestamptz(6)
+  createdAt         DateTime              @default(now()) @db.Timestamptz(6)
+  updatedAt         DateTime              @updatedAt @db.Timestamptz(6)
+  payment           Payment               @relation(fields: [paymentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  requestedByUser   User?                 @relation(fields: [requestedByUserId], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
   @@unique([provider, idempotencyKey])
   @@index([paymentId], map: "Refund_paymentId_idx_b2fe9a10")
@@ -758,6 +720,7 @@ model ProductAttributeOption {
   attributeId       String          @db.Uuid
   attributeOptionId String          @db.Uuid
   product           Product         @relation(fields: [productId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  attribute         Attribute       @relation(fields: [attributeId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   attributeOption   AttributeOption @relation(fields: [attributeOptionId], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
   @@id([productId, attributeOptionId])
@@ -766,11 +729,12 @@ model ProductAttributeOption {
 }
 
 model VariantAttributeOption {
-  productId         String         @db.Uuid
-  variantId         String         @db.Uuid
-  attributeId       String         @db.Uuid
-  attributeOptionId String         @db.Uuid
-  variant           ProductVariant @relation(fields: [variantId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  productId         String          @db.Uuid
+  variantId         String          @db.Uuid
+  attributeId       String          @db.Uuid
+  attributeOptionId String          @db.Uuid
+  variant           ProductVariant  @relation(fields: [variantId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  attributeOption   AttributeOption @relation(fields: [attributeOptionId], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
   @@id([variantId, attributeId])
   @@index([variantId], map: "VariantAttributeOption_variantId_idx_e16bb45d")
@@ -778,7 +742,6 @@ model VariantAttributeOption {
 
 model ProductTag {
   id              String           @id @default(uuid()) @db.Uuid
-  sourceTermId    String?          @unique
   name            String
   slug            String           @unique
   description     String?
@@ -804,9 +767,9 @@ model Product {
   slug                    String                   @unique
   description             String?
   shortDescription        String?
-  status                  String                   @default("draft")
-  productType             String                   @default("simple")
-  taxStatus               String                   @default("taxable")
+  status                  ProductStatus            @default(draft)
+  productType             ProductType              @default(simple)
+  taxStatus               ProductTaxStatus         @default(taxable)
   taxClass                String?
   publishedAt             DateTime?                @db.Timestamptz(6)
   archivedAt              DateTime?                @db.Timestamptz(6)
@@ -831,15 +794,15 @@ model ProductVariant {
   currencyCode            String                   @default("INR")
   saleStartsAt            DateTime?                @db.Timestamptz(6)
   saleEndsAt              DateTime?                @db.Timestamptz(6)
-  stockStatus             String                   @default("in_stock")
+  stockStatus             VariantStockStatus       @default(in_stock)
   manageStock             Boolean                  @default(false)
-  backorderPolicy         String                   @default("no")
+  backorderPolicy         BackorderPolicy          @default(no)
   weight                  Decimal?                 @db.Decimal(10, 3)
   length                  Decimal?                 @db.Decimal(10, 3)
   width                   Decimal?                 @db.Decimal(10, 3)
   height                  Decimal?                 @db.Decimal(10, 3)
   isDefault               Boolean                  @default(false)
-  status                  String                   @default("active")
+  status                  VariantStatus            @default(active)
   createdAt               DateTime                 @default(now()) @db.Timestamptz(6)
   updatedAt               DateTime                 @updatedAt @db.Timestamptz(6)
   archivedAt              DateTime?                @db.Timestamptz(6)
@@ -855,21 +818,21 @@ model ProductVariant {
 }
 
 model InventoryReservation {
-  id               String         @id @default(uuid()) @db.Uuid
-  orderId          String         @db.Uuid
-  orderItemId      String         @db.Uuid
-  variantId        String         @db.Uuid
+  id               String                     @id @default(uuid()) @db.Uuid
+  orderId          String                     @db.Uuid
+  orderItemId      String                     @db.Uuid
+  variantId        String                     @db.Uuid
   quantity         Int
-  quantityConsumed Int            @default(0)
-  status           String         @default("reserved")
-  expiresAt        DateTime?      @db.Timestamptz(6)
-  releasedAt       DateTime?      @db.Timestamptz(6)
-  consumedAt       DateTime?      @db.Timestamptz(6)
-  createdAt        DateTime       @default(now()) @db.Timestamptz(6)
-  updatedAt        DateTime       @updatedAt @db.Timestamptz(6)
-  order            Order          @relation(fields: [orderId], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  orderItem        OrderItem      @relation(fields: [orderItemId], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  variant          ProductVariant @relation(fields: [variantId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  quantityConsumed Int                        @default(0)
+  status           InventoryReservationStatus @default(reserved)
+  expiresAt        DateTime?                  @db.Timestamptz(6)
+  releasedAt       DateTime?                  @db.Timestamptz(6)
+  consumedAt       DateTime?                  @db.Timestamptz(6)
+  createdAt        DateTime                   @default(now()) @db.Timestamptz(6)
+  updatedAt        DateTime                   @updatedAt @db.Timestamptz(6)
+  order            Order                      @relation(fields: [orderId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  orderItem        OrderItem                  @relation(fields: [orderItemId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  variant          ProductVariant             @relation(fields: [variantId], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
   @@index([orderId], map: "InventoryReservation_orderId_idx_d284871b")
   @@index([orderItemId], map: "InventoryReservation_orderItemId_idx_99e2d9f7")
@@ -877,36 +840,38 @@ model InventoryReservation {
 }
 
 model ReturnRequest {
-  id                String    @id @default(uuid()) @db.Uuid
-  orderId           String    @db.Uuid
-  status            String    @default("requested")
+  id                String       @id @default(uuid()) @db.Uuid
+  orderId           String       @db.Uuid
+  status            ReturnStatus @default(requested)
   reason            String
   requestedByUserId String?
-  idempotencyKey    String    @unique
-  receivedAt        DateTime? @db.Timestamptz(6)
-  createdAt         DateTime  @default(now()) @db.Timestamptz(6)
-  updatedAt         DateTime  @updatedAt @db.Timestamptz(6)
-  order             Order     @relation(fields: [orderId], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  requestedByUser   User?     @relation(fields: [requestedByUserId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  returnItems       ReturnItem[]
+  idempotencyKey    String       @unique
+  receivedAt        DateTime?    @db.Timestamptz(6)
+  createdAt         DateTime     @default(now()) @db.Timestamptz(6)
+  updatedAt         DateTime     @updatedAt @db.Timestamptz(6)
+  order             Order        @relation(fields: [orderId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  requestedByUser   User?        @relation(fields: [requestedByUserId], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
   @@index([orderId], map: "ReturnRequest_orderId_idx_d284871b")
   @@index([requestedByUserId], map: "ReturnRequest_requestedByUserId_idx_85281b2d")
 }
 
 model ReturnItem {
-  id                String @id @default(uuid()) @db.Uuid
-  orderId           String @db.Uuid
-  returnRequestId   String @db.Uuid
-  orderItemId       String @db.Uuid
+  id                String        @id @default(uuid()) @db.Uuid
+  orderId           String        @db.Uuid
+  returnRequestId   String        @db.Uuid
+  orderItemId       String        @db.Uuid
   quantity          Int
-  restockedQuantity Int    @default(0)
+  restockedQuantity Int           @default(0)
+  returnRequest     ReturnRequest @relation(fields: [returnRequestId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  orderItem         OrderItem     @relation(fields: [orderItemId], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
   @@unique([returnRequestId, orderItemId])
 }
 
 model ShippingZone {
   id              String           @id @default(uuid()) @db.Uuid
-  sourceZoneId    String?          @unique
   name            String
   sortOrder       Int              @default(0)
   enabled         Boolean          @default(false)
@@ -916,22 +881,21 @@ model ShippingZone {
 }
 
 model ShippingMethod {
-  id               String       @id @default(uuid()) @db.Uuid
-  zoneId           String       @db.Uuid
-  sourceInstanceId String?      @unique
-  kind             String
-  title            String
-  enabled          Boolean      @default(false)
-  sortOrder        Int          @default(0)
-  currencyCode     String       @default("INR")
-  cost             Decimal      @default(0) @db.Decimal(12, 2)
-  requirement      String       @default("none")
-  minimumSubtotal  Decimal?     @db.Decimal(12, 2)
-  ignoreDiscounts  Boolean      @default(false)
-  taxable          Boolean      @default(false)
-  createdAt        DateTime     @default(now()) @db.Timestamptz(6)
-  updatedAt        DateTime     @updatedAt @db.Timestamptz(6)
-  zone             ShippingZone @relation(fields: [zoneId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  id              String              @id @default(uuid()) @db.Uuid
+  zoneId          String              @db.Uuid
+  kind            ShippingMethodKind
+  title           String
+  enabled         Boolean             @default(false)
+  sortOrder       Int                 @default(0)
+  currencyCode    String              @default("INR")
+  cost            Decimal             @default(0) @db.Decimal(12, 2)
+  requirement     ShippingRequirement @default(none)
+  minimumSubtotal Decimal?            @db.Decimal(12, 2)
+  ignoreDiscounts Boolean             @default(false)
+  taxable         Boolean             @default(false)
+  createdAt       DateTime            @default(now()) @db.Timestamptz(6)
+  updatedAt       DateTime            @updatedAt @db.Timestamptz(6)
+  zone            ShippingZone        @relation(fields: [zoneId], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
   @@index([zoneId], map: "ShippingMethod_zoneId_idx_1b631e86")
 }
@@ -942,4 +906,232 @@ model CouponShippingBenefit {
   createdAt    DateTime @default(now()) @db.Timestamptz(6)
   updatedAt    DateTime @updatedAt @db.Timestamptz(6)
   coupon       Coupon   @relation(fields: [couponId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+enum AdminAuditOutcome {
+  success
+  failure
+}
+
+enum AdminMembershipStatus {
+  active
+  suspended
+}
+
+enum AdminRole {
+  owner
+  editor
+  support
+}
+
+enum AttributeDisplayType {
+  select
+  swatch
+}
+
+enum AttributeStatus {
+  active
+  archived
+}
+
+enum BackorderPolicy {
+  no
+  notify
+  allow
+}
+
+enum CartStatus {
+  active
+  converted
+  abandoned
+}
+
+enum CategoryStatus {
+  active
+  archived
+}
+
+enum ContentEntryKind {
+  page
+  footer
+}
+
+enum ContentEntryStatus {
+  draft
+  published
+  private
+  archived
+}
+
+enum DiscountKind {
+  fixed
+  percentage
+}
+
+enum FulfillmentEventSource {
+  carrier
+  admin
+  system
+}
+
+enum FulfillmentStatus {
+  pending
+  packed
+  shipped
+  out_for_delivery
+  delivered
+  failed
+  returned
+}
+
+enum InventoryMovementReason {
+  initial_stock
+  restock
+  sale
+  return
+  cancellation
+  adjustment
+  damage
+}
+
+enum InventoryReservationStatus {
+  reserved
+  released
+  consumed
+  expired
+}
+
+enum MediaAssetStatus {
+  active
+  archived
+}
+
+enum MediaRole {
+  primary
+  gallery
+}
+
+enum OrderAddressType {
+  billing
+  shipping
+}
+
+enum OrderFulfillmentStatus {
+  unfulfilled
+  processing
+  partially_shipped
+  shipped
+  out_for_delivery
+  delivered
+  returned
+}
+
+enum OrderPaymentStatus {
+  pending
+  authorized
+  paid
+  failed
+  partially_refunded
+  refunded
+}
+
+enum OrderStatus {
+  created
+  confirmed
+  processing
+  shipped
+  out_for_delivery
+  delivered
+  cancelled
+  returned
+}
+
+enum OrderStatusHistorySource {
+  admin
+  system
+  carrier
+}
+
+enum PaymentEventProcessingStatus {
+  pending
+  processed
+  failed
+  ignored
+}
+
+enum PaymentOrderLifecycleStatus {
+  pending
+  created
+  attempted
+  paid
+  expired
+  cancelled
+}
+
+enum ProductStatus {
+  draft
+  active
+  archived
+}
+
+enum ProductTaxStatus {
+  taxable
+  shipping
+  none
+}
+
+enum ProductType {
+  simple
+  variable
+}
+
+enum RefundSpeedProcessed {
+  normal
+  instant
+}
+
+enum RefundSpeedRequested {
+  normal
+  optimum
+}
+
+enum RefundStatus {
+  pending
+  processed
+  failed
+}
+
+enum ReturnStatus {
+  requested
+  approved
+  rejected
+  received
+  completed
+  cancelled
+}
+
+enum ShippingMethodKind {
+  flat_rate
+  free_shipping
+}
+
+enum ShippingRequirement {
+  none
+  minimum_subtotal
+  coupon
+}
+
+enum UserRole {
+  admin
+  customer
+}
+
+enum VariantStatus {
+  active
+  archived
+}
+
+enum VariantStockStatus {
+  in_stock
+  out_of_stock
 }
