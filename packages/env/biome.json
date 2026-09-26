@@ -1,7 +1,5 @@
 {
 	"$schema": "https://biomejs.dev/schemas/2.5.14/schema.json",
 	"root": false,
-	"files": {
-		"includes": ["**", "!src/generated/prisma"]
-	}
+	"extends": ["@eshanika/biome-config/base"]
 }

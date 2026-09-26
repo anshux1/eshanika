@@ -1,0 +1,31 @@
+{
+	"name": "@eshanika/auth",
+	"version": "0.0.0",
+	"private": true,
+	"type": "module",
+	"exports": {
+		"./server": "./src/server.ts",
+		"./membership": "./src/membership.ts",
+		"./client": "./src/client.ts"
+	},
+	"scripts": {
+		"check-types": "tsc --noEmit",
+		"lint": "biome check"
+	},
+	"peerDependencies": {
+		"react": "^19.0.0"
+	},
+	"dependencies": {
+		"@eshanika/database": "workspace:*",
+		"@eshanika/env": "workspace:*",
+		"better-auth": "1.7.6"
+	},
+	"devDependencies": {
+		"@eshanika/biome-config": "workspace:*",
+		"@eshanika/typescript-config": "workspace:*",
+		"@types/node": "26.6.2",
+		"@types/react": "19.3.0",
+		"react": "19.3.0",
+		"typescript": "7.0.2"
+	}
+}

@@ -1,15 +1,8 @@
 import "dotenv/config";
-import postgres from "@prisma/orm-postgres/runtime";
-import type { Contract } from "./contract.d";
-import contractJson from "./contract.json" with { type: "json" };
+import { databaseEnv } from "@eshanika/env/database";
+import { PrismaPg } from "@prisma/adapter-pg";
+import { PrismaClient } from "../generated/prisma/client";
 
-const databaseUrl = process.env.DATABASE_URL;
+const adapter = new PrismaPg({ connectionString: databaseEnv.DATABASE_URL });
 
-if (!databaseUrl) {
-	throw new Error("DATABASE_URL is required to use the Prisma database client");
-}
-
-export const db = postgres<Contract>({
-	contractJson,
-	url: databaseUrl,
-});
+export const db = new PrismaClient({ adapter });

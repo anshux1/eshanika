@@ -1,0 +1,30 @@
+{
+	"name": "@eshanika/orpc",
+	"version": "0.0.0",
+	"private": true,
+	"type": "module",
+	"exports": {
+		"./router": "./src/router.ts",
+		"./client": "./src/client.ts",
+		"./query": "./src/query.ts",
+		"./rpc-handler": "./src/rpc-handler.ts",
+		"./openapi-handler": "./src/openapi-handler.ts"
+	},
+	"scripts": {
+		"check-types": "tsc --noEmit",
+		"lint": "biome check"
+	},
+	"dependencies": {
+		"@eshanika/auth": "workspace:*",
+		"@orpc/client": "2.0.0-beta.40",
+		"@orpc/openapi": "2.0.0-beta.40",
+		"@orpc/server": "2.0.0-beta.40",
+		"@orpc/tanstack-query": "2.0.0-beta.40",
+		"@orpc/zod": "2.0.0-beta.40",
+		"zod": "4.6.5"
+	},
+	"devDependencies": {
+		"@eshanika/biome-config": "workspace:*",
+		"typescript": "7.0.2"
+	}
+}
