@@ -1,6 +1,13 @@
-"use client";
+import type { AnyNestedClient } from "@orpc/client";
+import {
+	createTanstackQueryUtils,
+	type RouterUtils,
+} from "@orpc/tanstack-query";
 
-import { createTanstackQueryUtils } from "@orpc/tanstack-query";
-import { client } from "./client";
+export function createQueryUtils<TClient extends AnyNestedClient>(
+	client: TClient,
+): RouterUtils<TClient> {
+	return createTanstackQueryUtils(client);
+}
 
-export const orpc = createTanstackQueryUtils(client);
+export type QueryUtils<TClient extends AnyNestedClient> = RouterUtils<TClient>;

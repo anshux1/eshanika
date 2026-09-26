@@ -4,7 +4,8 @@
 	"private": true,
 	"type": "module",
 	"exports": {
-		"./db": "./src/prisma/db.ts"
+		"./db": "./src/prisma/db.ts",
+		"./enums": "./src/generated/prisma/enums.ts"
 	},
 	"scripts": {
 		"build": "prisma generate",
