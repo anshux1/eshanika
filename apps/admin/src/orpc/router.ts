@@ -1,5 +1,7 @@
-import { authRouter } from "./auth/router";
+import { authRouter } from "@/features/auth/router";
+import { healthRouter } from "@/features/health/router";
 
 export const router = {
-	auth: authRouter,
+  auth: authRouter,
+  health: healthRouter,
 };

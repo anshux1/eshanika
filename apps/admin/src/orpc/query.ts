@@ -1,6 +1,6 @@
 "use client";
 
-import { createTanstackQueryUtils } from "@orpc/tanstack-query";
+import { createQueryUtils, type QueryUtils } from "@eshanika/orpc/query";
 import { client } from "./client";
 
-export const orpc = createTanstackQueryUtils(client);
+export const orpc: QueryUtils<typeof client> = createQueryUtils(client);
