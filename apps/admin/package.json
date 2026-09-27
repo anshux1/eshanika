@@ -12,8 +12,12 @@
     "seed:owner": "tsx ./scripts/seed-owner.ts"
   },
   "dependencies": {
+    "@better-upload/client": "3.0.19",
+    "@better-upload/server": "3.0.19",
     "@eshanika/auth": "workspace:*",
     "@eshanika/database": "workspace:*",
+    "@eshanika/email": "workspace:*",
+    "@eshanika/env": "workspace:*",
     "@eshanika/orpc": "workspace:*",
     "@eshanika/ui": "workspace:*",
     "@hookform/resolvers": "5.9.1",
@@ -22,6 +26,7 @@
     "@orpc/zod": "2.0.0-beta.40",
     "@tanstack/react-query": "5.104.0",
     "better-auth": "1.7.6",
+    "image-size": "2.0.4",
     "lucide-react": "1.48.0",
     "motion": "^13.4.4",
     "next": "16.3.6",

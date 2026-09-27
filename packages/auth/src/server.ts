@@ -4,11 +4,14 @@ import { authEnv } from "@eshanika/env/auth";
 import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 
+// Only the admin origin is trusted, so callback and redirect URLs cannot point elsewhere.
+// The upload route reuses this list so both entry points accept the same origins.
+export const trustedOrigins = [new URL(authEnv.BETTER_AUTH_URL).origin];
+
 export const auth = betterAuth({
 	appName: "Eshanika Admin",
 	baseURL: authEnv.BETTER_AUTH_URL,
-	// Only the admin origin is trusted, so callback and redirect URLs cannot point elsewhere.
-	trustedOrigins: [authEnv.BETTER_AUTH_URL],
+	trustedOrigins,
 	database: prismaAdapter(db, {
 		provider: "postgresql",
 	}),
