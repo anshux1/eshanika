@@ -5,7 +5,9 @@
 	"type": "module",
 	"exports": {
 		"./send-email": "./src/send-email.ts",
+		"./send-admin-invitation-email": "./src/send-admin-invitation-email.ts",
 		"./send-password-reset-email": "./src/send-password-reset-email.ts",
+		"./templates/admin-invitation-email": "./src/templates/admin-invitation-email.ts",
 		"./templates/password-reset-email": "./src/templates/password-reset-email.ts"
 	},
 	"scripts": {
