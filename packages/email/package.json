@@ -1,32 +1,25 @@
 {
-	"name": "@eshanika/auth",
+	"name": "@eshanika/email",
 	"version": "0.0.0",
 	"private": true,
 	"type": "module",
 	"exports": {
-		"./server": "./src/server.ts",
-		"./membership": "./src/membership.ts",
-		"./client": "./src/client.ts"
+		"./send-email": "./src/send-email.ts",
+		"./send-password-reset-email": "./src/send-password-reset-email.ts",
+		"./templates/password-reset-email": "./src/templates/password-reset-email.ts"
 	},
 	"scripts": {
 		"check-types": "tsc --noEmit",
 		"lint": "biome check"
 	},
-	"peerDependencies": {
-		"react": "^19.0.0"
-	},
 	"dependencies": {
-		"@eshanika/database": "workspace:*",
-		"@eshanika/email": "workspace:*",
 		"@eshanika/env": "workspace:*",
-		"better-auth": "1.7.6"
+		"resend": "6.30.0"
 	},
 	"devDependencies": {
 		"@eshanika/biome-config": "workspace:*",
 		"@eshanika/typescript-config": "workspace:*",
 		"@types/node": "26.6.2",
-		"@types/react": "19.3.0",
-		"react": "19.3.0",
 		"typescript": "7.0.2"
 	}
 }

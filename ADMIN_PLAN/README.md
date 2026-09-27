@@ -16,7 +16,7 @@ The plan for `apps/admin`, the internal back office for the Eshanika jewellery s
 | `packages/env`, `packages/orpc`: typed env, base procedure, pagination schema, and client/handler factories every app uses | Done (Phase 00) |
 | `packages/auth`: Better Auth email/password, admin membership lookup, `auth.adminSession` | Started (Phase 01) |
 | `apps/admin`: admin router, RPC and OpenAPI handlers, audit helper, providers, UI patterns, status home page | Done (Phase 00) |
-| Google sign-in, admin screens, uploads, payments | Not started |
+| Admin screens, uploads, payments | Not started |
 
 The old plans marked Phases 00 and 01 as done. That code no longer exists, so the plan starts again from Phase 00. Nothing from WordPress or WooCommerce is in scope: no import tools, no legacy data rules, no Elementor layouts.
 
@@ -28,7 +28,7 @@ The old plans marked Phases 00 and 01 as done. That code no longer exists, so th
 | UI | shadcn/ui on Base UI, Tailwind v4, `@eshanika/ui` |
 | Data | Neon PostgreSQL, Prisma 7 with the `pg` adapter (`@eshanika/database`) |
 | API | oRPC + TanStack Query. Each app owns its router; `@eshanika/orpc` holds only shared plumbing. OpenAPI at `/api/v1` |
-| Auth | Better Auth, email/password and Google (`@eshanika/auth`) |
+| Auth | Better Auth, email/password only (`@eshanika/auth`) |
 | Env | T3 Env + Zod (`@eshanika/env`), validated at import |
 | Forms | react-hook-form + Zod |
 | Files | IDrive e2 (S3-compatible) through Better Upload |
