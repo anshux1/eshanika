@@ -8,7 +8,7 @@
 - `team.members.list`, `team.members.update` (role, suspend, restore).
 - `team.invitations.list`, `create`, `revoke`, `resend`, and `accept`.
 - Invitation tokens: random, stored only as a hash, single use, expire after 7 days. Send the link by email. The raw link is also shown once to the owner.
-- `/invite/[token]`: the invitee signs up or signs in (email or Google) with the invited email. Accepting creates or updates `User.role = admin` and the `AdminMembership` in one transaction.
+- `/invite/[token]`: the invitee signs up or signs in with the invited email. Accepting creates or updates `User.role = admin` and the `AdminMembership` in one transaction.
 
 ## Rules
 

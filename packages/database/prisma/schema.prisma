@@ -101,19 +101,6 @@ model AttributeOption {
   @@index([attributeId], map: "AttributeOption_attributeId_idx_58ec5fae")
 }
 
-model AuthRateBucket {
-  key       String   @id
-  count     Int
-  expiresAt DateTime @db.Timestamptz(6)
-}
-
-model AuthEvent {
-  id        String   @id @default(uuid()) @db.Uuid
-  action    String
-  requestId String   @db.Uuid
-  createdAt DateTime @default(now()) @db.Timestamptz(6)
-}
-
 model User {
   id                   String               @id
   name                 String
@@ -181,6 +168,13 @@ model Verification {
   expiresAt  DateTime @db.Timestamptz(6)
   createdAt  DateTime @default(now()) @db.Timestamptz(6)
   updatedAt  DateTime @updatedAt @db.Timestamptz(6)
+}
+
+model RateLimit {
+  id          String @id @default(uuid()) @db.Uuid
+  key         String @unique
+  count       Int
+  lastRequest BigInt
 }
 
 model Cart {

@@ -1,6 +1,6 @@
 # Schema changes needed
 
-The Prisma schema in `packages/database/prisma/schema.prisma` is almost ready. Each change ships as a migration (`pnpm --filter @eshanika/database db:migrate:dev`). These changes come from dropping WordPress/WooCommerce, switching admin sign-in to email and Google, and a few gaps found while planning. Apply each group in the phase listed.
+The Prisma schema in `packages/database/prisma/schema.prisma` is almost ready. Each change ships as a migration (`pnpm --filter @eshanika/database db:migrate:dev`). These changes come from dropping WordPress/WooCommerce, switching admin sign-in to email-only, and a few gaps found while planning. Apply each group in the phase listed.
 
 ## Phase 00: remove WordPress/WooCommerce leftovers (done, migration `remove_legacy_import_fields`)
 
@@ -20,9 +20,10 @@ The Prisma schema in `packages/database/prisma/schema.prisma` is almost ready. E
 
 ## Phase 01: authentication
 
-- Check the Better Auth tables (`User`, `Session`, `Account`, `Verification`) against the current Better Auth docs for Google sign-in.
+- Check the Better Auth tables (`User`, `Session`, `Account`, `Verification`) against the current Better Auth docs for email/password sign-in.
 - Rate limiting uses Upstash, so drop `AuthRateBucket`. Keep `AuthEvent` only if Phase 01 writes to it. Otherwise drop it.
 - `User.phoneNumber` and `phoneNumberVerified`: keep them only if the storefront will use phone login. Decide when the store app is planned.
+- Applied 2026-09-26 (migrations `drop_unused_auth_tables`, `add_rate_limit_table`): dropped `AuthRateBucket` and `AuthEvent` (both unused). Added `RateLimit` for Better Auth database rate limiting, since no Upstash Redis is provisioned yet; switching storage to Upstash later needs no schema change.
 
 ## Phase 03: invitations
 

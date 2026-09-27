@@ -1,4 +1,4 @@
-import { getAdminMembership } from "@eshanika/auth/membership";
+import { getActiveAdmin } from "@eshanika/auth/membership";
 import { auth } from "@eshanika/auth/server";
 import { AdminRole } from "@eshanika/database/enums";
 import { publicProcedure } from "@eshanika/orpc/base";
@@ -41,8 +41,8 @@ export const authRouter = {
       });
       if (!currentSession) throw new ORPCError("UNAUTHORIZED");
 
-      const membership = await getAdminMembership(currentSession.user.id);
-      if (membership?.status !== "active") {
+      const admin = await getActiveAdmin(currentSession.user.id);
+      if (!admin) {
         throw new ORPCError("FORBIDDEN");
       }
 
@@ -52,7 +52,7 @@ export const authRouter = {
           name: currentSession.user.name,
           email: currentSession.user.email,
         },
-        role: membership.role,
+        role: admin.membershipRole,
       };
     }),
 };
