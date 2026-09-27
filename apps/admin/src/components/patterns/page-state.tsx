@@ -13,11 +13,41 @@ const ERROR_COPY: Record<string, string> = {
   TOO_MANY_REQUESTS: "Too many requests. Wait a moment and try again.",
 };
 
+// Services send short, safe sentences for these codes, such as the last-owner rule.
+const SERVER_MESSAGE_CODES = new Set([
+  "BAD_REQUEST",
+  "FORBIDDEN",
+  "NOT_FOUND",
+  "CONFLICT",
+  "TOO_MANY_REQUESTS",
+]);
+
+// oRPC fills a missing message with the title-cased code, like "Bad Request".
+function isDefaultMessage(code: string, message: string) {
+  return message.toLowerCase() === code.replaceAll("_", " ").toLowerCase();
+}
+
+export function errorCode(error: unknown) {
+  return error && typeof error === "object" && "code" in error
+    ? String(error.code)
+    : undefined;
+}
+
 export function errorMessage(error: unknown) {
-  const code =
-    error && typeof error === "object" && "code" in error
-      ? String(error.code)
-      : undefined;
+  const code = errorCode(error);
+  const message =
+    error instanceof Error && error.message.trim() ? error.message : undefined;
+  if (code === "BAD_REQUEST" && message === "Input validation failed") {
+    return "Some fields are not valid. Check them and try again.";
+  }
+  if (
+    code &&
+    message &&
+    SERVER_MESSAGE_CODES.has(code) &&
+    !isDefaultMessage(code, message)
+  ) {
+    return message;
+  }
   if (code && ERROR_COPY[code]) return ERROR_COPY[code];
   return "Something went wrong. Try again.";
 }

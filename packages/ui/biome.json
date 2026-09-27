@@ -17,6 +17,9 @@
 				"rules": {
 					"suspicious": {
 						"noArrayIndexKey": "off"
+					},
+					"correctness": {
+						"useExhaustiveDependencies": "off"
 					}
 				}
 			}

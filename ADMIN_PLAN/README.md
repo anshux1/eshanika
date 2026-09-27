@@ -17,8 +17,8 @@ The plan for `apps/admin`, the internal back office for the Eshanika jewellery s
 | `packages/env`, `packages/orpc`: typed env, base procedure, pagination schema, and client/handler factories every app uses | Done (Phase 00) |
 | `packages/auth`: Better Auth email/password, admin membership lookup, `auth.adminSession` | Started (Phase 01) |
 | `apps/admin`: admin router, RPC and OpenAPI handlers, audit helper, providers, UI patterns, status home page | Done (Phase 00) |
-| Phase 02 to 06 admin backend | Implemented; frontend and live service checks pending |
-| Admin screens, payments | Not started |
+| Phase 02 to 06 admin backend and screens | Implemented; live email and IDrive e2 checks pending |
+| Phase 07+ screens, payments | Not started |
 
 The old plans marked Phases 00 and 01 as done. That code no longer exists, so the plan starts again from Phase 00. Nothing from WordPress or WooCommerce is in scope: no import tools, no legacy data rules, no Elementor layouts.
 
@@ -171,5 +171,5 @@ Every admin can read the catalogue and the dashboard. There must always be at le
 | :-: | --- |
 | 00 | Done (2026-09-26) |
 | 01 | In progress |
-| 02-06 | Backend implemented; frontend pending (see `frontend-02-06.md`) |
+| 02-06 | Backend and screens done (2026-09-27); live email and IDrive e2 checks pending |
 | 07-17 | Not started |
