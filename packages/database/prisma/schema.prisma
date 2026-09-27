@@ -50,7 +50,7 @@ model AdminAuditLog {
 model AdminInvitation {
   id               String    @id @default(uuid()) @db.Uuid
   tokenHash        String    @unique
-  phoneNumber      String
+  email            String
   role             AdminRole
   invitedByUserId  String
   acceptedByUserId String?
@@ -58,6 +58,13 @@ model AdminInvitation {
   acceptedAt       DateTime? @db.Timestamptz(6)
   revokedAt        DateTime? @db.Timestamptz(6)
   createdAt        DateTime  @default(now()) @db.Timestamptz(6)
+  invitedBy        User      @relation("AdminInvitationInvitedBy", fields: [invitedByUserId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  acceptedBy       User?     @relation("AdminInvitationAcceptedBy", fields: [acceptedByUserId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([email], map: "AdminInvitation_email_idx")
+  @@index([invitedByUserId], map: "AdminInvitation_invitedByUserId_idx")
+  @@index([acceptedByUserId], map: "AdminInvitation_acceptedByUserId_idx")
+  @@index([createdAt], map: "AdminInvitation_createdAt_idx")
 }
 
 model AdminMembership {
@@ -102,29 +109,31 @@ model AttributeOption {
 }
 
 model User {
-  id                   String               @id
-  name                 String
-  email                String               @unique
-  emailVerified        Boolean              @default(false)
-  image                String?
-  createdAt            DateTime             @default(now()) @db.Timestamptz(6)
-  updatedAt            DateTime             @updatedAt @db.Timestamptz(6)
-  phoneNumber          String?              @unique
-  phoneNumberVerified  Boolean?
-  role                 UserRole             @default(customer)
-  userAddresses        UserAddress[]
-  adminMembership      AdminMembership?
-  sessions             Session[]
-  accounts             Account[]
-  carts                Cart[]
-  couponRedemptions    CouponRedemption[]
-  fulfillmentEvents    FulfillmentEvent[]
-  inventoryMovements   InventoryMovement[]
-  orders               Order[]
-  orderStatusHistories OrderStatusHistory[]
-  orderNotes           OrderNote[]
-  refunds              Refund[]
-  returnRequests       ReturnRequest[]
+  id                       String               @id
+  name                     String
+  email                    String               @unique
+  emailVerified            Boolean              @default(false)
+  image                    String?
+  createdAt                DateTime             @default(now()) @db.Timestamptz(6)
+  updatedAt                DateTime             @updatedAt @db.Timestamptz(6)
+  phoneNumber              String?              @unique
+  phoneNumberVerified      Boolean?
+  role                     UserRole             @default(customer)
+  userAddresses            UserAddress[]
+  adminMembership          AdminMembership?
+  sessions                 Session[]
+  accounts                 Account[]
+  adminInvitationsSent     AdminInvitation[]    @relation("AdminInvitationInvitedBy")
+  adminInvitationsAccepted AdminInvitation[]    @relation("AdminInvitationAcceptedBy")
+  carts                    Cart[]
+  couponRedemptions        CouponRedemption[]
+  fulfillmentEvents        FulfillmentEvent[]
+  inventoryMovements       InventoryMovement[]
+  orders                   Order[]
+  orderStatusHistories     OrderStatusHistory[]
+  orderNotes               OrderNote[]
+  refunds                  Refund[]
+  returnRequests           ReturnRequest[]
 }
 
 model Session {
