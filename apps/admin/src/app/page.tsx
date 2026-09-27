@@ -9,9 +9,11 @@ import { PageHeader } from "@/components/patterns/page-header";
 import { StatusBadge } from "@/components/patterns/status-badge";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { BrowserHealthCheck } from "@/features/health/components/browser-health-check";
+import { requireAdmin } from "@/lib/require-admin";
 import { getServerClient } from "@/orpc/server-client";
 
 export default async function Home() {
+  await requireAdmin("/");
   const client = await getServerClient();
   const serverPing = await client.health.ping().catch(() => null);
 
