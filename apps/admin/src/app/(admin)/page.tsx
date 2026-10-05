@@ -13,6 +13,10 @@ const DESCRIPTIONS: Record<string, string> = {
   "/attributes": "Manage sizes, metals, colours, and their options.",
   "/tags": "Group products with tags for search and collections.",
   "/media": "Upload images and keep alt text up to date.",
+  "/orders": "Confirm, pack, and ship orders, or cancel them.",
+  "/customers": "Look up a customer's details, cart, and order history.",
+  "/inventory": "Check stock for every variant and record changes.",
+  "/inventory/movements": "See every stock change and export it as CSV.",
   "/team": "Change roles or suspend admin access.",
   "/team/invitations": "Invite new admins and manage pending links.",
 };
