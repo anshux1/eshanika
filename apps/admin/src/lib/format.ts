@@ -72,3 +72,32 @@ export function fromIstInputValue(value: string) {
   if (!value) return null;
   return new Date(`${value}:00${IST_OFFSET}`).toISOString();
 }
+
+// Date filters pick whole India-time days, from midnight to the last millisecond.
+export function istDayStart(day: string) {
+  return `${day}T00:00:00.000${IST_OFFSET}`;
+}
+
+export function istDayEnd(day: string) {
+  return `${day}T23:59:59.999${IST_OFFSET}`;
+}
+
+type PostalAddress = {
+  addressLine1: string;
+  addressLine2: string | null;
+  landmark: string | null;
+  city: string;
+  state: string;
+  postalCode: string;
+  countryCode: string;
+};
+
+export function addressLines(address: PostalAddress) {
+  return [
+    address.addressLine1,
+    address.addressLine2,
+    address.landmark ? `Near ${address.landmark}` : null,
+    `${address.city}, ${address.state} ${address.postalCode}`,
+    address.countryCode === "IN" ? null : address.countryCode,
+  ].filter((line): line is string => Boolean(line));
+}

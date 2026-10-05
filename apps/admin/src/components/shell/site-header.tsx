@@ -24,6 +24,16 @@ const SEGMENT_LABELS: Record<string, string> = {
   team: "Team",
   invitations: "Invitations",
   new: "New product",
+  orders: "Orders",
+  customers: "Customers",
+  inventory: "Stock levels",
+  movements: "Movements",
+};
+
+// Record IDs are named after the list they belong to.
+const RECORD_LABELS: Record<string, string> = {
+  orders: "Order",
+  customers: "Customer",
 };
 
 type Crumb = { label: string; href: string };
@@ -34,7 +44,10 @@ function crumbsFor(pathname: string): Crumb[] {
   segments.forEach((segment, index) => {
     crumbs.push({
       // Unknown segments are record IDs, such as a product being edited.
-      label: SEGMENT_LABELS[segment] ?? "Edit",
+      label:
+        SEGMENT_LABELS[segment] ??
+        RECORD_LABELS[segments[index - 1] ?? ""] ??
+        "Edit",
       href: `/${segments.slice(0, index + 1).join("/")}`,
     });
   });

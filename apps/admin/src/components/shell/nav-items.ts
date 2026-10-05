@@ -1,10 +1,14 @@
 import {
+  Boxes,
+  ContactRound,
   FolderTree,
+  History,
   Images,
   LayoutDashboard,
   type LucideIcon,
   MailPlus,
   Package,
+  ShoppingBag,
   SlidersHorizontal,
   Tags,
   Users,
@@ -56,6 +60,40 @@ export const NAV_GROUPS: NavGroup[] = [
     ],
   },
   {
+    label: "Sales",
+    items: [
+      {
+        title: "Orders",
+        href: "/orders",
+        icon: ShoppingBag,
+        permission: "orders.read",
+      },
+      {
+        title: "Customers",
+        href: "/customers",
+        icon: ContactRound,
+        permission: "orders.read",
+      },
+    ],
+  },
+  {
+    label: "Inventory",
+    items: [
+      {
+        title: "Stock levels",
+        href: "/inventory",
+        icon: Boxes,
+        permission: "inventory.write",
+      },
+      {
+        title: "Movements",
+        href: "/inventory/movements",
+        icon: History,
+        permission: "inventory.write",
+      },
+    ],
+  },
+  {
     label: "Team",
     items: [
       {
@@ -86,6 +124,7 @@ export function visibleNavGroups(permissions: readonly string[]): NavGroup[] {
 
 export function isActivePath(pathname: string, href: string) {
   if (href === "/") return pathname === "/";
-  if (href === "/team") return pathname === "/team";
+  // These parents have their own child entries in the sidebar.
+  if (href === "/team" || href === "/inventory") return pathname === href;
   return pathname === href || pathname.startsWith(`${href}/`);
 }
