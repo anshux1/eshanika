@@ -15,7 +15,7 @@ export class PrismaCustomerRepository {
             ]
           : undefined,
       },
-      orderBy: { id: "asc" },
+      orderBy: [{ createdAt: "desc" }, { id: "desc" }],
       cursor: input.cursor ? { id: input.cursor } : undefined,
       skip: input.cursor ? 1 : 0,
       take: input.limit + 1,

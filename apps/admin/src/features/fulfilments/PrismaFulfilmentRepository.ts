@@ -67,6 +67,13 @@ async function syncOrder(tx: Tx, orderId: string, actor: AdminActor) {
     fulfillmentStatus = "delivered";
   if (ordered > 0 && shipped === ordered && allReturned)
     fulfillmentStatus = "returned";
+  // Parcels arrive at different times, so once one is out for delivery the
+  // order doesn't step back to shipped when another lags behind.
+  if (
+    fulfillmentStatus === "shipped" &&
+    order.fulfillmentStatus === "out_for_delivery"
+  )
+    fulfillmentStatus = "out_for_delivery";
   const status =
     fulfillmentStatus === "shipped" ||
     fulfillmentStatus === "out_for_delivery" ||
