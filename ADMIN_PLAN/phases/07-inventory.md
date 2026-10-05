@@ -7,7 +7,7 @@
 - `/inventory`: every managed-stock variant with on hand, reserved, available (on hand minus reserved), and reorder point. Filter by low stock and out of stock.
 - Adjust dialog: amount (+/-), reason (`restock`, `adjustment`, `damage`, `initial_stock`), note, and a preview of the new balance.
 - `/inventory/movements`: ledger filtered by variant, reason, and date. CSV export.
-- `inventory.adjust` writes an `InventoryMovement` and updates `InventoryLevel` in one transaction. It locks the level row and uses the dialog's idempotency key.
+- `inventory.adjust` writes an `InventoryMovement` and updates `InventoryLevel` in one serializable transaction. It retries write conflicts and uses the dialog's idempotency key.
 - Keep `ProductVariant.stockStatus` in sync when available stock crosses zero.
 
 ## Rules
