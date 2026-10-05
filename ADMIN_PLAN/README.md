@@ -8,7 +8,7 @@ The plan for `apps/admin`, the internal back office for the Eshanika jewellery s
 - `frontend-07-10.md`: screen and client work to pair with the Phase 07 to 10 backend.
 - `phases/NN-*.md`: one short brief per feature. Build them in order.
 
-## Current state (2026-09-27)
+## Current state (2026-10-05)
 
 | Area | Status |
 | --- | --- |
@@ -19,8 +19,8 @@ The plan for `apps/admin`, the internal back office for the Eshanika jewellery s
 | `packages/auth`: Better Auth email/password, admin membership lookup, `auth.adminSession` | Started (Phase 01) |
 | `apps/admin`: admin router, RPC and OpenAPI handlers, audit helper, providers, UI patterns, status home page | Done (Phase 00) |
 | Phase 02 to 06 admin backend and screens | Implemented; live email and IDrive e2 checks pending |
-| Phase 07 to 10 backend | Implemented and verified against a local database (2026-10-05) |
-| Phase 07+ screens, payments | Not started |
+| Phase 07 to 10 backend and screens | Done; verified end to end against a local database (2026-10-05) |
+| Phase 11+ (returns, payments, coupons, settings, content, reports) | Not started |
 
 The old plans marked Phases 00 and 01 as done. That code no longer exists, so the plan starts again from Phase 00. Nothing from WordPress or WooCommerce is in scope: no import tools, no legacy data rules, no Elementor layouts.
 
@@ -174,5 +174,5 @@ Every admin can read the catalogue and the dashboard. There must always be at le
 | 00 | Done (2026-09-26) |
 | 01 | In progress |
 | 02-06 | Backend and screens done (2026-09-27); live email and IDrive e2 checks pending |
-| 07-10 | Backend done and verified (2026-10-05); screens pending |
+| 07-10 | Backend and screens done (2026-10-05) |
 | 11-17 | Not started |
