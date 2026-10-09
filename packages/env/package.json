@@ -6,7 +6,8 @@
 	"exports": {
 		"./database": "./src/database.ts",
 		"./auth": "./src/auth.ts",
-		"./email": "./src/email.ts"
+		"./email": "./src/email.ts",
+		"./razorpay": "./src/razorpay.ts"
 	},
 	"scripts": {
 		"check-types": "tsc --noEmit",
