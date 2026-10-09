@@ -45,6 +45,9 @@ model AdminAuditLog {
   ipAddress      String?           @db.Inet
   userAgent      String?
   createdAt      DateTime          @default(now()) @db.Timestamptz(6)
+
+  @@index([createdAt])
+  @@index([actorUserId, createdAt])
 }
 
 model AdminInvitation {
