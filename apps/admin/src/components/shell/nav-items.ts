@@ -1,5 +1,7 @@
 import {
+  Activity,
   Boxes,
+  ChartColumn,
   ContactRound,
   CreditCard,
   FileText,
@@ -14,6 +16,7 @@ import {
   PanelBottom,
   ReceiptIndianRupee,
   ShoppingBag,
+  ShoppingCart,
   SlidersHorizontal,
   Tags,
   TicketPercent,
@@ -161,6 +164,29 @@ export const NAV_GROUPS: NavGroup[] = [
         href: "/settings/fees",
         icon: ReceiptIndianRupee,
         permission: "settings.write",
+      },
+    ],
+  },
+  {
+    label: "Insights",
+    items: [
+      {
+        title: "Reports",
+        href: "/reports",
+        icon: ChartColumn,
+        permission: "reports.read",
+      },
+      {
+        title: "Abandoned carts",
+        href: "/carts",
+        icon: ShoppingCart,
+        permission: "reports.read",
+      },
+      {
+        title: "Activity",
+        href: "/activity",
+        icon: Activity,
+        permission: "audit.read",
       },
     ],
   },

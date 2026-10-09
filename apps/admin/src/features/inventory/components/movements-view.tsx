@@ -33,6 +33,7 @@ import {
   type StatusTone,
 } from "@/components/patterns/status-badge";
 import { useUrlState } from "@/hooks/use-url-state";
+import { downloadCsv } from "@/lib/download-csv";
 import { formatDateTime, istDayEnd, istDayStart } from "@/lib/format";
 import { client } from "@/orpc/client";
 import { orpc } from "@/orpc/query";
@@ -50,17 +51,6 @@ const REASON_TONES: Record<InventoryMovementReason, StatusTone> = {
 };
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-
-function downloadCsv(fileName: string, content: string) {
-  const href = URL.createObjectURL(
-    new Blob([content], { type: "text/csv;charset=utf-8" }),
-  );
-  const link = document.createElement("a");
-  link.href = href;
-  link.download = fileName;
-  link.click();
-  URL.revokeObjectURL(href);
-}
 
 export function MovementsView() {
   const url = useUrlState();
