@@ -34,6 +34,10 @@ const SEGMENT_LABELS: Record<string, string> = {
   settings: "Settings",
   shipping: "Shipping",
   fees: "Fees",
+  content: "Content",
+  pages: "Pages",
+  menus: "Menus",
+  footer: "Footer",
 };
 
 // Record IDs are named after the list they belong to.
@@ -41,11 +45,13 @@ const RECORD_LABELS: Record<string, string> = {
   orders: "Order",
   customers: "Customer",
   coupons: "Coupon",
+  pages: "Page",
 };
 
 const NEW_LABELS: Record<string, string> = {
   products: "New product",
   coupons: "New coupon",
+  pages: "New page",
 };
 
 type Crumb = { label: string; href: string };
