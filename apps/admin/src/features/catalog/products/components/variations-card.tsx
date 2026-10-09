@@ -51,6 +51,7 @@ import {
 import { useMemo, useState } from "react";
 import { Controller, useFieldArray, useFormContext } from "react-hook-form";
 import { toast } from "sonner";
+import { MultiSelect } from "@/components/patterns/multi-select";
 import { errorMessage } from "@/components/patterns/page-state";
 import { StatusBadge } from "@/components/patterns/status-badge";
 import {
@@ -58,7 +59,6 @@ import {
   useAllAttributes,
 } from "@/features/catalog/taxonomy/hooks/use-taxonomy-lists";
 import { client } from "@/orpc/client";
-import { MultiSelect } from "./multi-select";
 import {
   combinationKey,
   emptyVariant,

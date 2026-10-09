@@ -11,8 +11,9 @@ import { useQuery } from "@tanstack/react-query";
 import { ArrowLeft, CircleAlert, Printer } from "lucide-react";
 import Link from "next/link";
 import { FulfilmentSection } from "@/features/fulfilments/components/fulfilment-section";
+import { OrderPayments } from "@/features/payments/components/order-payments";
+import { OrderReturns } from "@/features/returns/components/order-returns";
 import { addressLines, formatDateTime } from "@/lib/format";
-import { formatInr, paiseToRupees } from "@/lib/money";
 import { orpc } from "@/orpc/query";
 import { OrderActions } from "./order-actions";
 import {
@@ -39,9 +40,13 @@ function sameAddress(a: Address | undefined, b: Address | undefined) {
 export function OrderDetail({
   initialOrder,
   canWrite,
+  canReadPayments,
+  canRefund,
 }: {
   initialOrder: Order;
   canWrite: boolean;
+  canReadPayments: boolean;
+  canRefund: boolean;
 }) {
   const query = useQuery({
     ...orpc.orders.get.queryOptions({ input: { id: initialOrder.id } }),
@@ -53,9 +58,6 @@ export function OrderDetail({
   );
   const billing = order.orderAddresses.find(
     (address) => address.addressType === "billing",
-  );
-  const payments = order.paymentOrders.flatMap(
-    (paymentOrder) => paymentOrder.payments,
   );
 
   return (
@@ -141,6 +143,7 @@ export function OrderDetail({
         <div className="min-w-0 space-y-6">
           <OrderItemsCard order={order} />
           <FulfilmentSection canWrite={canWrite} order={order} />
+          <OrderReturns canWrite={canWrite} order={order} />
           <OrderTimeline order={order} />
         </div>
         <div className="space-y-6">
@@ -219,52 +222,14 @@ export function OrderDetail({
             </CardContent>
           </Card>
 
-          <Card id="payment">
-            <CardHeader>
-              <CardTitle className="flex items-center justify-between gap-2">
-                Payment
-                <PaymentStatusBadge status={order.paymentStatus} />
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3 text-sm">
-              {order.paidAt ? (
-                <p className="text-muted-foreground">
-                  Paid {formatDateTime(order.paidAt)}
-                </p>
-              ) : null}
-              {payments.length === 0 ? (
-                <p className="text-muted-foreground">
-                  No payment attempts recorded.
-                </p>
-              ) : (
-                <ul className="space-y-2">
-                  {payments.map((payment) => (
-                    <li className="flex justify-between gap-3" key={payment.id}>
-                      <span className="capitalize">
-                        {payment.status.replaceAll("_", " ")}
-                      </span>
-                      <span className="text-right tabular-nums">
-                        {formatInr(paiseToRupees(Number(payment.amountMinor)))}
-                        {payment.amountRefundedMinor !== "0" ? (
-                          <span className="block text-xs text-muted-foreground">
-                            {formatInr(
-                              paiseToRupees(
-                                Number(payment.amountRefundedMinor),
-                              ),
-                            )}{" "}
-                            refunded
-                          </span>
-                        ) : null}
-                      </span>
-                    </li>
-                  ))}
-                </ul>
-              )}
-              <p className="text-xs text-muted-foreground">
-                Refunds can't be issued from the admin yet.
-              </p>
-            </CardContent>
-          </Card>
+          {canReadPayments ? (
+            <OrderPayments
+              canRefund={canRefund}
+              orderId={order.id}
+              paidAt={order.paidAt}
+              paymentStatus={order.paymentStatus}
+            />
+          ) : null}
 
           <OrderNotes canWrite={canWrite} order={order} />
         </div>

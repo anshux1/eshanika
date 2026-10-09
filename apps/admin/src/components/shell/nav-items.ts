@@ -1,6 +1,7 @@
 import {
   Boxes,
   ContactRound,
+  CreditCard,
   FolderTree,
   History,
   Images,
@@ -8,9 +9,13 @@ import {
   type LucideIcon,
   MailPlus,
   Package,
+  ReceiptIndianRupee,
   ShoppingBag,
   SlidersHorizontal,
   Tags,
+  TicketPercent,
+  Truck,
+  Undo2,
   Users,
 } from "lucide-react";
 import type { AdminPermission } from "@/orpc/permissions";
@@ -69,10 +74,33 @@ export const NAV_GROUPS: NavGroup[] = [
         permission: "orders.read",
       },
       {
+        title: "Returns",
+        href: "/returns",
+        icon: Undo2,
+        permission: "orders.read",
+      },
+      {
+        title: "Payments",
+        href: "/payments",
+        icon: CreditCard,
+        permission: "payments.read",
+      },
+      {
         title: "Customers",
         href: "/customers",
         icon: ContactRound,
         permission: "orders.read",
+      },
+    ],
+  },
+  {
+    label: "Marketing",
+    items: [
+      {
+        title: "Coupons",
+        href: "/coupons",
+        icon: TicketPercent,
+        permission: "marketing.write",
       },
     ],
   },
@@ -90,6 +118,23 @@ export const NAV_GROUPS: NavGroup[] = [
         href: "/inventory/movements",
         icon: History,
         permission: "inventory.write",
+      },
+    ],
+  },
+  {
+    label: "Settings",
+    items: [
+      {
+        title: "Shipping",
+        href: "/settings/shipping",
+        icon: Truck,
+        permission: "settings.write",
+      },
+      {
+        title: "Fees",
+        href: "/settings/fees",
+        icon: ReceiptIndianRupee,
+        permission: "settings.write",
       },
     ],
   },

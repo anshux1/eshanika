@@ -26,6 +26,10 @@ import { useRouter } from "next/navigation";
 import { useCallback, useMemo, useState } from "react";
 import { Controller, FormProvider, useForm } from "react-hook-form";
 import { toast } from "sonner";
+import {
+  MultiSelect,
+  type MultiSelectItem,
+} from "@/components/patterns/multi-select";
 import { errorCode, errorMessage } from "@/components/patterns/page-state";
 import { SimpleSelect } from "@/components/patterns/simple-select";
 import { ProductMediaCard } from "@/features/catalog/media/components/product-media-card";
@@ -37,7 +41,6 @@ import {
 import { useUnsavedChanges } from "@/hooks/use-unsaved-changes";
 import { client } from "@/orpc/client";
 import { orpc } from "@/orpc/query";
-import { MultiSelect, type MultiSelectItem } from "./multi-select";
 import {
   EMPTY_PRODUCT,
   emptyVariant,

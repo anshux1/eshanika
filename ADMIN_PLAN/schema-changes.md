@@ -31,5 +31,5 @@ The Prisma schema in `packages/database/prisma/schema.prisma` is almost ready. E
 
 ## Later phases
 
-- Phase 12: add a `refunds` relation from `ReturnRequest` if refunds should link to the return that caused them.
-- Phase 14: `OrderFee` exists, but order totals have no fee component. Add `Order.feeAmount` before turning on the COD fee.
+- Phase 12: not added. Returns link to the order's Payment card instead, so refunds don't need a `ReturnRequest` relation.
+- Phase 14 (done, migration `add_order_fee_and_zone_states`): added `Order.feeAmount` so totals include the COD fee, and `ShippingZone.states` (Indian state names) so checkout can pick a zone. An empty list covers every state no other zone lists.

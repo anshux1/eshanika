@@ -27,6 +27,8 @@ export default async function OrderPage({ params }: PageProps<"/orders/[id]">) {
   });
   return (
     <OrderDetail
+      canReadPayments={permissions.includes("payments.read")}
+      canRefund={permissions.includes("refunds.write")}
       canWrite={permissions.includes("orders.write")}
       initialOrder={order}
       key={order.id}
