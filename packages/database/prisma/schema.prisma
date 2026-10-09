@@ -474,6 +474,7 @@ model Order {
   discountAmount        Decimal                @default(0) @db.Decimal(12, 2)
   taxAmount             Decimal                @default(0) @db.Decimal(12, 2)
   shippingAmount        Decimal                @default(0) @db.Decimal(12, 2)
+  feeAmount             Decimal                @default(0) @db.Decimal(12, 2)
   totalAmount           Decimal                @default(0) @db.Decimal(12, 2)
   billingEmail          String
   customerNote          String?
@@ -876,6 +877,8 @@ model ReturnItem {
 model ShippingZone {
   id              String           @id @default(uuid()) @db.Uuid
   name            String
+  // Indian state names this zone covers. An empty list covers every state no other zone lists.
+  states          String[]         @default([])
   sortOrder       Int              @default(0)
   enabled         Boolean          @default(false)
   createdAt       DateTime         @default(now()) @db.Timestamptz(6)
