@@ -172,21 +172,6 @@ export class PrismaOrderRepository {
             },
           },
         },
-        paymentOrders: {
-          select: {
-            id: true,
-            status: true,
-            payments: {
-              select: {
-                id: true,
-                status: true,
-                amountMinor: true,
-                amountRefundedMinor: true,
-                capturedAt: true,
-              },
-            },
-          },
-        },
       },
     });
     if (!order) return null;
@@ -216,14 +201,6 @@ export class PrismaOrderRepository {
             discountAmount: order.couponRedemption.discountAmount.toString(),
           }
         : null,
-      paymentOrders: order.paymentOrders.map((paymentOrder) => ({
-        ...paymentOrder,
-        payments: paymentOrder.payments.map((payment) => ({
-          ...payment,
-          amountMinor: payment.amountMinor.toString(),
-          amountRefundedMinor: payment.amountRefundedMinor.toString(),
-        })),
-      })),
     };
   }
 
