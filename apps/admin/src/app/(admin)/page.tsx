@@ -2,6 +2,7 @@ import { ArrowUpRight } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { visibleNavGroups } from "@/components/shell/nav-items";
+import { DashboardTiles } from "@/features/dashboard/components/dashboard-tiles";
 import { BrowserHealthCheck } from "@/features/health/components/browser-health-check";
 import { requireAdmin } from "@/lib/require-admin";
 
@@ -19,6 +20,17 @@ const DESCRIPTIONS: Record<string, string> = {
   "/inventory/movements": "See every stock change and export it as CSV.",
   "/team": "Change roles or suspend admin access.",
   "/team/invitations": "Invite new admins and manage pending links.",
+  "/returns": "Move returned items from requested to restocked.",
+  "/payments": "See Razorpay payments, refunds, and webhook events.",
+  "/coupons": "Create discount codes and see who used them.",
+  "/settings/shipping": "Set shipping zones, methods, and free-shipping rules.",
+  "/settings/fees": "Turn the cash-on-delivery fee on or off.",
+  "/content/pages": "Write and publish store pages.",
+  "/content/menus": "Arrange the header and footer links.",
+  "/content/footer": "Edit the text at the bottom of every page.",
+  "/reports": "Sales, top products, customers, and coupon use.",
+  "/carts": "See carts customers left behind.",
+  "/activity": "Every change the team made, and who made it.",
 };
 
 function greeting() {
@@ -54,10 +66,11 @@ export default async function OverviewPage() {
           Welcome back, {user.name.split(" ")[0]}
         </h1>
         <p className="relative mt-2 max-w-xl text-sm text-muted-foreground">
-          Everything for the Eshanika store lives here. Pick up where you left
-          off below. Sales charts and reports arrive in a later update.
+          Here's how the store is doing and what needs attention today.
         </p>
       </section>
+
+      <DashboardTiles />
 
       {shortcuts.length > 0 ? (
         <section aria-labelledby="shortcuts-heading" className="space-y-3">

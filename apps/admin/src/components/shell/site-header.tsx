@@ -38,6 +38,9 @@ const SEGMENT_LABELS: Record<string, string> = {
   pages: "Pages",
   menus: "Menus",
   footer: "Footer",
+  reports: "Reports",
+  carts: "Abandoned carts",
+  activity: "Activity",
 };
 
 // Record IDs are named after the list they belong to.
