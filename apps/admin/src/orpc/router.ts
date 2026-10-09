@@ -3,6 +3,7 @@ import { authRouter } from "@/features/auth/router";
 import { mediaRouter } from "@/features/catalog/media/router";
 import { productsRouter } from "@/features/catalog/products/router";
 import { taxonomyRouter } from "@/features/catalog/taxonomy/router";
+import { contentRouter } from "@/features/content/router";
 import { couponsRouter } from "@/features/coupons/router";
 import { customersRouter } from "@/features/customers/router";
 import { feesRouter } from "@/features/fees/router";
@@ -35,4 +36,5 @@ export const router = {
   coupons: couponsRouter,
   shipping: shippingRouter,
   fees: feesRouter,
+  content: contentRouter,
 };
